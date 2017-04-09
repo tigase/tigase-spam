@@ -1,0 +1,6 @@
+
+= Overview
+:author: Andrzej Wójcik
+:date: 2017-04-09
+
+This Tigase SPAM Filter project contains additional features provided for Tigase XMPP Server to reduce number of sent/received SPAM messages.

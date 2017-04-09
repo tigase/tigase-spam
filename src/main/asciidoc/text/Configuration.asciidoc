@@ -1,0 +1,42 @@
+
+= Configuration
+:author: Andrzej Wójcik
+:date: 2017-04-09
+
+To enable default set of SPAM filters with default settings you need to enable SessionManager processor +spam-filter+. To do so you need to add +spam-filter+ to comma separated list of enabled processors in `--sm-plugins` property of `etc/init.properties` file.
+
+.Enabling default SPAM filters
+[source,properties]
+----
+--sm-plugins=spam-filter
+----
+
+== Changing list of active SPAM filters
+You can configure list of active SPAM filters by setting list of comma separate classes implementing `SpamFilter` interface to +spam-filter+ `filter-classes` property.
+
+.Setting list of active filters
+[source,properties]
+----
+plugins-conf/spam-filter/filter-classes[s]=tigase.spam.filters.MessageFilterSameLongBody,tigase.spam.filters.MucMessageFilterEnsureToFullJid
+----
+
+== Sending error when +message+ is dropped
+By default, due to nature of SPAM, you do not want to send error message when SPAM message is dropped as sending error back will:
+
+* increase traffic on a server (which in rare cases may lead to overload of a XMPP server)
+* notify spammer that it was not possible to delivery message
+
+It is possible to configure +spam-filter+ to send error back, by setting +true+ to +spam-filter+ +return-error+ property:
+
+.Allow sending error
+[source,properties]
+----
+sess-man/plugins-conf/spam-filter/return-error[B]=true
+----
+
+== Enabling logging of dropped messages
+It is possible to enable logging of dropped messages by adding `spam` to comma separate list of values for `--debug` property.
+[source,propeties]
+----
+--debug=spam
+----

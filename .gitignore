@@ -1,0 +1,5 @@
+/.idea/
+/docs/
+/target/
+*.iml
+*.ipr

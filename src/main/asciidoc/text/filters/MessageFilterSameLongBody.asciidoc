@@ -17,30 +17,48 @@ Below is list of possible settings which may be modified to adjust this filter b
 SPAM messages are usually longer messages (over 100 chars).
 To reduce overhead of filtering and memory required for filtering we check length of message body and process it further only if message exceeds declared message body length _(default: 100 chars)_.
 
-You can also check messages with smaller body (ie. only 50 chars) by setting `message-same-long-body-size` property to `50`.
+You can also check messages with smaller body (ie. only 50 chars) by setting `body-size` property to `50`.
 
 .Setting filter to check message with body bigger that 50 chars
-[source,properties]
+[source,dsl]
 ----
-sess-man/plugins-conf/spam-filter/message-same-long-body-size[I]=50
+'sess-man' () {
+    'spam-filter' () {
+        'message-same-long-body' () {
+            body-size = 50
+        }
+    }
+}
 ----
 
 == Number of allowed message with same body
 In most cases message with same body is sent to multiple users. Filter will count messages with same body (which is bigger that declared message body length) and if it exceeds message number limit then any further message with same body will be detected and marked as SPAM.
-By default we allow 20 messages with same body to be processed by +SessionManager+. If you wish to change this limit set `message-same-long-body-number-limit` to appropriate value.
+By default we allow 20 messages with same body to be processed by +SessionManager+. If you wish to change this limit set `number-limit` to appropriate value.
 
 .Setting number of allowed message to 10
-[source,properties]
+[source,dsl]
 ----
-sess-man/plugins-conf/spam-filter/message-same-long-body-number-limit[I]=10
+'sess-man' () {
+    'spam-filter' () {
+        'message-same-long-body' () {
+            number-limit = 10
+        }
+    }
+}
 ----
 
 == Size of counters cache
 We process every message and for every body of message which body length exceeds body length limit we needs to keep counter. This counters are kept in cache which size is configurable and by default equals `10000`.
-To change size of counters cache assign proper value to `message-same-long-body-counter-size-limit`.
+To change size of counters cache assign proper value to `counter-size-limit`.
 
 .Increasing cache size to 1000000
-[source,properties]
+[source,dsl]
 ----
-sess-man/plugins-conf/spam-filter/message-same-long-body-counter-size-limit[I]=1000000
+'sess-man' () {
+    'spam-filter' () {
+        'message-same-long-body' () {
+            counter-size-limit = 1000000
+        }
+    }
+}
 ----

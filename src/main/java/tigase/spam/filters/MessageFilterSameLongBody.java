@@ -1,8 +1,11 @@
 package tigase.spam.filters;
 
+import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.spam.SpamFilter;
+import tigase.spam.SpamProcessor;
 import tigase.util.Algorithms;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -10,7 +13,6 @@ import tigase.xmpp.XMPPResourceConnection;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -19,20 +21,24 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 08.04.2017.
  */
+@Bean(name = MessageFilterSameLongBody.ID, parent = SpamProcessor.class, active = true)
 public class MessageFilterSameLongBody implements SpamFilter {
 
 	private static final Logger log = Logger.getLogger(MessageFilterSameLongBody.class.getCanonicalName());
 
 	private static final Charset CHARSET_UTF8 = Charset.forName("utf-8");
 
-	private static final String ID = "message-same-long-body";
+	protected static final String ID = "message-same-long-body";
 
 	private final ConcurrentHashMap<String,Integer> counter = new ConcurrentHashMap<>();
 
+	@ConfigField(desc = "Check message with body bigger that this limit", alias = "body-size")
 	private int longMessageSize = 100;
 
+	@ConfigField(desc = "Limit size of message counter cache", alias = "counter-size-limit")
 	private int messageCounterSizeLimit = 10000;
 
+	@ConfigField(desc = "Limit number of message with same body", alias = "number-limit")
 	private int messageNumberLimit = 20;
 
 	private final AtomicBoolean cleanerRunning = new AtomicBoolean(false);
@@ -41,14 +47,7 @@ public class MessageFilterSameLongBody implements SpamFilter {
 	public String getId() {
 		return ID;
 	}
-
-	@Override
-	public void init(Map<String, Object> props) {
-		longMessageSize = (Integer) props.getOrDefault("size", 100);
-		messageCounterSizeLimit = (Integer) props.getOrDefault("counter-size-limit", 100 * 10000);
-		messageNumberLimit = (Integer) props.getOrDefault("number-limit", 20);
-	}
-
+	
 	@Override
 	public boolean filter(Packet packet, XMPPResourceConnection session) {
 		if (packet.getElemName() != Message.ELEM_NAME || packet.getType() == StanzaType.groupchat) {

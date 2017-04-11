@@ -79,7 +79,7 @@ public class MessageFilterSameLongBody implements SpamFilter {
 
 			boolean result = count <= messageNumberLimit;
 
-			if (log.isLoggable(Level.FINEST) && !result && count < 30) {
+			if (log.isLoggable(Level.FINEST) && !result && count < (messageNumberLimit + 10)) {
 				log.log(Level.FINEST, "Message is assumed to be spam. Already seen {0} message with body: {1}",
 						new Object[]{count, body});
 			}

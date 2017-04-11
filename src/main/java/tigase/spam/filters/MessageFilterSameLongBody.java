@@ -45,7 +45,7 @@ public class MessageFilterSameLongBody implements SpamFilter {
 	@Override
 	public void init(Map<String, Object> props) {
 		longMessageSize = (Integer) props.getOrDefault("size", 100);
-		messageCounterSizeLimit = (Integer) props.getOrDefault("counter-size-limit", 100 * 10000);
+		messageCounterSizeLimit = (Integer) props.getOrDefault("counter-size-limit", 10000);
 		messageNumberLimit = (Integer) props.getOrDefault("number-limit", 20);
 	}
 
@@ -80,7 +80,7 @@ public class MessageFilterSameLongBody implements SpamFilter {
 
 			boolean result = count <= messageNumberLimit;
 
-			if (log.isLoggable(Level.FINEST) && !result && count < 30) {
+			if (log.isLoggable(Level.FINEST) && !result && count < (messageNumberLimit+10)) {
 				log.log(Level.FINEST, "Message is assumed to be spam. Already seen {0} message with body: {1}",
 						new Object[]{count, body});
 			}

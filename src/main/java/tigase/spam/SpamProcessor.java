@@ -6,6 +6,7 @@ import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Packet;
 import tigase.spam.filters.MessageFilterSameLongBody;
 import tigase.spam.filters.MucMessageFilterEnsureToFullJid;
+import tigase.stats.StatisticsList;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
@@ -68,6 +69,7 @@ public class SpamProcessor
 							  NonAuthUserRepository nonAuthUserRepository, Queue<Packet> queue,
 							  Map<String, Object> map) {
 		for (SpamFilter filter : filters) {
+			
 			if (!filter.filter(packet, session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "filter {0} detected spam message {1}, sending error = {2}",
@@ -80,5 +82,11 @@ public class SpamProcessor
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		filters.forEach(filter -> filter.getStatistics(this.id(), list));
 	}
 }

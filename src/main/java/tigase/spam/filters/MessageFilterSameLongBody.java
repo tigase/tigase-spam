@@ -6,6 +6,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
+import tigase.stats.StatisticsList;
 import tigase.util.Algorithms;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -42,7 +43,11 @@ public class MessageFilterSameLongBody implements SpamFilter {
 	private int messageNumberLimit = 20;
 
 	private final AtomicBoolean cleanerRunning = new AtomicBoolean(false);
-	
+
+	private long filteredMessages = 0L;
+	private long spamMessages = 0L;
+	private long avgProcessingTime = 0L;
+
 	@Override
 	public String getId() {
 		return ID;
@@ -54,12 +59,16 @@ public class MessageFilterSameLongBody implements SpamFilter {
 			return true;
 		}
 
-		String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
-		if (body == null || body.length() <= longMessageSize) {
-			return true;
-		}
+		filteredMessages++;
+
+		long start = System.currentTimeMillis();
 
 		try {
+			String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
+			if (body == null || body.length() <= longMessageSize) {
+				return true;
+			}
+
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			String hash = Algorithms.bytesToHex(md.digest(body.getBytes(CHARSET_UTF8)));
 
@@ -77,18 +86,30 @@ public class MessageFilterSameLongBody implements SpamFilter {
 				}
 			}
 
-			boolean result = count <= messageNumberLimit;
-
-			if (log.isLoggable(Level.FINEST) && !result && count < (messageNumberLimit + 10)) {
-				log.log(Level.FINEST, "Message is assumed to be spam. Already seen {0} message with body: {1}",
-						new Object[]{count, body});
+			if (count > messageNumberLimit) {
+				spamMessages++;
+				if (log.isLoggable(Level.FINEST) && count < (messageNumberLimit + 10)) {
+					log.log(Level.FINEST, "Message is assumed to be spam. Already seen {0} message with body: {1}",
+							new Object[]{count, body});
+				}
+				return false;
 			}
-
-			return result;
 		} catch (NoSuchAlgorithmException ex) {
 			log.log(Level.WARNING, "Algorithm SHA-256 in not available!", ex);
+		} finally {
+			avgProcessingTime += (System.currentTimeMillis()-start) / 2L;
 		}
 		return true;
+	}
+
+	@Override
+	public void getStatistics(String name, StatisticsList list) {
+		if (list.checkLevel(Level.FINE)) {
+			list.add(name, getId() + "/Filtered messages", filteredMessages, Level.FINE);
+			list.add(name, getId() + "/Spam messages", spamMessages, Level.FINE);
+			list.add(name, getId() + "/Average processing time", avgProcessingTime, Level.FINE);
+			list.add(name, getId() + "/Cache size", counter.size(), Level.FINE);
+		}
 	}
 
 	private class CleanerTask extends Thread {

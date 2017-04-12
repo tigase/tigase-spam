@@ -8,6 +8,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
+import tigase.stats.StatisticsList;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
@@ -45,6 +46,7 @@ public class SpamProcessor
 							  NonAuthUserRepository nonAuthUserRepository, Queue<Packet> queue,
 							  Map<String, Object> map) {
 		for (SpamFilter filter : filters) {
+			
 			if (!filter.filter(packet, session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "filter {0} detected spam message {1}, sending error = {2}",
@@ -67,5 +69,11 @@ public class SpamProcessor
 	@Override
 	public void unregister(Kernel kernel) {
 
+	}
+
+	@Override
+	public void getStatistics(StatisticsList list) {
+		super.getStatistics(list);
+		filters.forEach(filter -> filter.getStatistics(this.id(), list));
 	}
 }

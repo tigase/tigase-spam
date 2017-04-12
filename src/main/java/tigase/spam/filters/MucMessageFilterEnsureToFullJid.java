@@ -5,6 +5,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
+import tigase.stats.StatisticsList;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
@@ -23,6 +24,10 @@ public class MucMessageFilterEnsureToFullJid
 
 	protected static final String ID = "muc-message-ensure-to-full-jid";
 
+	private long filteredMessages = 0L;
+	private long avgProcessingTime = 0L;
+	private long spamMessages = 0L;
+
 	@Override
 	public String getId() {
 		return ID;
@@ -34,19 +39,38 @@ public class MucMessageFilterEnsureToFullJid
 			return true;
 		}
 
+		filteredMessages++;
+		long start = System.currentTimeMillis();
 		try {
 			if (session != null && session.isAuthorized()) {
 				if (session.isUserId(packet.getStanzaTo().getBareJID())) {
-					return packet.getStanzaTo().getResource() != null;
+					if (packet.getStanzaTo().getResource() == null) {
+						spamMessages++;
+						return false;
+					}
+					return true;
 				}
 			} else {
+				spamMessages++;
 				return false;
 			}
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Could not compare packet " + packet +
 					" destination with session bare jid as session is not authorized yet", ex);
+			spamMessages++;
 			return false;
+		} finally {
+			avgProcessingTime += (System.currentTimeMillis()-start) / 2;
 		}
 		return true;
+	}
+
+	@Override
+	public void getStatistics(String name, StatisticsList list) {
+		if (list.checkLevel(Level.FINE)) {
+			list.add(name, getId() + "/Filtered messages", filteredMessages, Level.FINE);
+			list.add(name, getId() + "/Spam messages", spamMessages, Level.FINE);
+			list.add(name, getId() + "/Average processing time", avgProcessingTime, Level.FINE);
+		}
 	}
 }

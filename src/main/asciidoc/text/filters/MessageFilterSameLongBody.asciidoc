@@ -1,10 +1,10 @@
 
-= SPAM detection based on same long message body
+= Same long message body
 :author: Andrzej Wójcik
 :date: 2017-04-09
 
 When there is a SPAM being sent using XMPP server in most cases number of messages with longer `body` size increases and in most cases every SPAM message contains same `body` part.
-To detect this use case `tigase.spam.filters.MessageFilterSameLongBody.class` was created.
+This filter is identified by following id `message-same-long-body`.
 
 Detection is based on:
 

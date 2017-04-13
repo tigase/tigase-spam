@@ -24,6 +24,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Packet;
+import tigase.spam.filters.MessageErrorFilterEnsureErrorChild;
 import tigase.spam.filters.MessageFilterSameLongBody;
 import tigase.spam.filters.MucMessageFilterEnsureToFullJid;
 import tigase.stats.StatisticsList;
@@ -53,7 +54,8 @@ public class SpamProcessor
 	private static final Logger log = Logger.getLogger(SpamProcessor.class.getCanonicalName());
 
 	private static final String[] DEFAULT_FILTERS = {MessageFilterSameLongBody.class.getCanonicalName(),
-													 MucMessageFilterEnsureToFullJid.class.getCanonicalName()};
+													 MucMessageFilterEnsureToFullJid.class.getCanonicalName(),
+													 MessageErrorFilterEnsureErrorChild.class.getCanonicalName()};
 
 	private List<SpamFilter> filters = new CopyOnWriteArrayList<>();
 

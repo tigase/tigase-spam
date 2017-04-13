@@ -18,4 +18,5 @@ In this section there is a list of available filters and detailed description of
 
 :leveloffset: 2
 include::text/filters/MessageFilterSameLongBody.asciidoc[]
+include::text/filters/MessageErrorFilterEnsureErrorChild.asciidoc[]
 include::text/filters/MucMessageFilterEnsureToFullJid.asciidoc[]

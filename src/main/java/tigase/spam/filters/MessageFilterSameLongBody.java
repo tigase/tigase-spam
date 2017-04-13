@@ -4,7 +4,6 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
-import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
 import tigase.stats.StatisticsList;
 import tigase.util.Algorithms;
@@ -23,7 +22,7 @@ import java.util.logging.Logger;
  * Created by andrzej on 08.04.2017.
  */
 @Bean(name = MessageFilterSameLongBody.ID, parent = SpamProcessor.class, active = true)
-public class MessageFilterSameLongBody implements SpamFilter {
+public class MessageFilterSameLongBody extends AbstractSpamFilter {
 
 	private static final Logger log = Logger.getLogger(MessageFilterSameLongBody.class.getCanonicalName());
 
@@ -44,24 +43,16 @@ public class MessageFilterSameLongBody implements SpamFilter {
 
 	private final AtomicBoolean cleanerRunning = new AtomicBoolean(false);
 
-	private long filteredMessages = 0L;
-	private long spamMessages = 0L;
-	private long avgProcessingTime = 0L;
-
 	@Override
 	public String getId() {
 		return ID;
 	}
 	
 	@Override
-	public boolean filter(Packet packet, XMPPResourceConnection session) {
+	protected boolean filterPacket(Packet packet, XMPPResourceConnection session) {
 		if (packet.getElemName() != Message.ELEM_NAME || packet.getType() == StanzaType.groupchat) {
 			return true;
 		}
-
-		filteredMessages++;
-
-		long start = System.currentTimeMillis();
 
 		try {
 			String body = packet.getElemCDataStaticStr(Message.MESSAGE_BODY_PATH);
@@ -87,7 +78,6 @@ public class MessageFilterSameLongBody implements SpamFilter {
 			}
 
 			if (count > messageNumberLimit) {
-				spamMessages++;
 				if (log.isLoggable(Level.FINEST) && count < (messageNumberLimit + 10)) {
 					log.log(Level.FINEST, "Message is assumed to be spam. Already seen {0} message with body: {1}",
 							new Object[]{count, body});
@@ -96,18 +86,14 @@ public class MessageFilterSameLongBody implements SpamFilter {
 			}
 		} catch (NoSuchAlgorithmException ex) {
 			log.log(Level.WARNING, "Algorithm SHA-256 in not available!", ex);
-		} finally {
-			avgProcessingTime += (System.currentTimeMillis()-start) / 2L;
 		}
 		return true;
 	}
 
 	@Override
 	public void getStatistics(String name, StatisticsList list) {
+		super.getStatistics(name, list);
 		if (list.checkLevel(Level.FINE)) {
-			list.add(name, getId() + "/Filtered messages", filteredMessages, Level.FINE);
-			list.add(name, getId() + "/Spam messages", spamMessages, Level.FINE);
-			list.add(name, getId() + "/Average processing time", avgProcessingTime, Level.FINE);
 			list.add(name, getId() + "/Cache size", counter.size(), Level.FINE);
 		}
 	}

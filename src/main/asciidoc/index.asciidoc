@@ -20,3 +20,4 @@ In this section there is a list of available filters and detailed description of
 include::text/filters/MessageFilterSameLongBody.asciidoc[]
 include::text/filters/MessageErrorFilterEnsureErrorChild.asciidoc[]
 include::text/filters/MucMessageFilterEnsureToFullJid.asciidoc[]
+include::text/filters/KnownSpammersFilter.asciidoc[]

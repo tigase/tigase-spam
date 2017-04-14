@@ -22,6 +22,8 @@ package tigase.spam;
 
 import org.osgi.framework.*;
 import tigase.osgi.ModulesManager;
+import tigase.spam.filters.KnownSpammersFilter;
+import tigase.spam.filters.MessageErrorFilterEnsureErrorChild;
 import tigase.spam.filters.MessageFilterSameLongBody;
 import tigase.spam.filters.MucMessageFilterEnsureToFullJid;
 
@@ -34,7 +36,8 @@ import java.util.List;
 public class Activator implements BundleActivator, ServiceListener {
 
 	private final List<Class> exportedClasses = Arrays.asList(
-			SpamProcessor.class, MessageFilterSameLongBody.class, MucMessageFilterEnsureToFullJid.class
+			SpamProcessor.class, MessageFilterSameLongBody.class, MucMessageFilterEnsureToFullJid.class,
+			KnownSpammersFilter.class, MessageErrorFilterEnsureErrorChild.class
 	);
 	private BundleContext context;
 	private ServiceReference serviceReference;

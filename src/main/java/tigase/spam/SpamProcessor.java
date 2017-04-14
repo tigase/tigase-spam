@@ -24,6 +24,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.Packet;
+import tigase.spam.filters.KnownSpammersFilter;
 import tigase.spam.filters.MessageErrorFilterEnsureErrorChild;
 import tigase.spam.filters.MessageFilterSameLongBody;
 import tigase.spam.filters.MucMessageFilterEnsureToFullJid;
@@ -53,11 +54,14 @@ public class SpamProcessor
 
 	private static final Logger log = Logger.getLogger(SpamProcessor.class.getCanonicalName());
 
-	private static final String[] DEFAULT_FILTERS = {MessageFilterSameLongBody.class.getCanonicalName(),
+	private static final String[] DEFAULT_FILTERS = {KnownSpammersFilter.class.getCanonicalName(),
+													 MessageFilterSameLongBody.class.getCanonicalName(),
 													 MucMessageFilterEnsureToFullJid.class.getCanonicalName(),
 													 MessageErrorFilterEnsureErrorChild.class.getCanonicalName()};
 
 	private List<SpamFilter> filters = new CopyOnWriteArrayList<>();
+
+	private List<ResultsAwareSpamFilter> resultsAwareFilters = new CopyOnWriteArrayList<>();
 
 	private boolean returnError = false;
 
@@ -79,8 +83,11 @@ public class SpamProcessor
 													  e -> e.getValue()));
 					filter.init(props);
 					filters.add(filter);
+					if (filter instanceof ResultsAwareSpamFilter) {
+						resultsAwareFilters.add((ResultsAwareSpamFilter) filter);
+					}
 				} catch (Exception ex) {
-					log.log(Level.WARNING, "Could not initialize SPAM filter " + cls);
+					log.log(Level.WARNING, "Could not initialize SPAM filter " + cls, ex);
 				}
 			}
 		}
@@ -91,12 +98,12 @@ public class SpamProcessor
 							  NonAuthUserRepository nonAuthUserRepository, Queue<Packet> queue,
 							  Map<String, Object> map) {
 		for (SpamFilter filter : filters) {
-			
 			if (!filter.filter(packet, session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "filter {0} detected spam message {1}, sending error = {2}",
 							new Object[]{filter.getId(), packet, returnError});
 				}
+				resultsAwareFilters.forEach(resultAware -> resultAware.identifiedSpam(packet, session));
 				if (!returnError) {
 					packet.processedBy(ID);
 				}

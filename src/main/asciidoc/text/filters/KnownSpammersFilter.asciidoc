@@ -9,6 +9,8 @@ This will result in a ban for any packet exchange with this user for configured 
 
 If user will send a burst of spam messages then he will be banned for configured ban time for every spam message, ie. if user would send 20 messages and ban time will be set to 15 minutes then users will be banned for 300 minutes (5 hours).
 
+`tigase.spam.filters.KnownSpammersFilter` class is implementation of this filter.
+
 [ban-time]
 == Ban time
 Time in minutes for which user marked as spammer will not be able to exchange packets with any other users. By default this value is set to 15 minutes and if you would like to increase it to 30 minutes just add following line to `etc/init.properties` file:

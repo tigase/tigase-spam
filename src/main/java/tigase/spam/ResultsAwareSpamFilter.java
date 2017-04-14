@@ -1,5 +1,5 @@
 /*
- * SpamFilter.java
+ * ResultsAwareSpamFilter.java
  *
  * Tigase Jabber/XMPP Server
  * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
@@ -21,19 +21,13 @@
 package tigase.spam;
 
 import tigase.server.Packet;
-import tigase.stats.StatisticsList;
 import tigase.xmpp.XMPPResourceConnection;
 
 /**
- * Created by andrzej on 08.04.2017.
+ * Created by andrzej on 13.04.2017.
  */
-public interface SpamFilter {
+public interface ResultsAwareSpamFilter extends SpamFilter {
 
-	boolean filter(Packet packet, XMPPResourceConnection session);
+	void identifiedSpam(Packet packet, XMPPResourceConnection session);
 
-	String getId();
-	
-	default void getStatistics(String name, StatisticsList list) {
-
-	}
 }

@@ -28,12 +28,14 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
+import tigase.spam.filters.KnownSpammersFilter;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Id;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,6 +60,9 @@ public class SpamProcessor
 	@Inject
 	private CopyOnWriteArrayList<SpamFilter> filters = new CopyOnWriteArrayList<>();
 
+	@Inject
+	private CopyOnWriteArrayList<ResultsAwareSpamFilter> resultsAwareFilters = new CopyOnWriteArrayList<>();
+
 	@ConfigField(desc = "Return error if packet is dropped", alias = "return-error")
 	private boolean returnError = false;
 
@@ -66,12 +71,12 @@ public class SpamProcessor
 							  NonAuthUserRepository nonAuthUserRepository, Queue<Packet> queue,
 							  Map<String, Object> map) {
 		for (SpamFilter filter : filters) {
-			
 			if (!filter.filter(packet, session)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "filter {0} detected spam message {1}, sending error = {2}",
 							new Object[]{filter.getId(), packet, returnError});
 				}
+				resultsAwareFilters.forEach(resultAware -> resultAware.identifiedSpam(packet, session));
 				if (!returnError) {
 					packet.processedBy(ID);
 				}
@@ -95,5 +100,32 @@ public class SpamProcessor
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		filters.forEach(filter -> filter.getStatistics(this.id(), list));
+	}
+
+	public void setFilters(CopyOnWriteArrayList<SpamFilter> filters) {
+		if (filters == null) {
+			filters = new CopyOnWriteArrayList<>();
+		}
+		KnownSpammersFilter knownSpammers = null;
+		Iterator<SpamFilter> it = filters.iterator();
+		while (it.hasNext()) {
+			SpamFilter filter = it.next();
+			if (filter instanceof KnownSpammersFilter) {
+				knownSpammers = (KnownSpammersFilter) filter;
+				it.remove();
+				break;
+			}
+		}
+		if (knownSpammers != null) {
+			filters.add(0, knownSpammers);
+		}
+		this.filters = filters;
+	}
+
+	public void setResultsAwareFilters(CopyOnWriteArrayList<ResultsAwareSpamFilter> resultsAwareFilters) {
+		if (resultsAwareFilters == null) {
+			resultsAwareFilters = new CopyOnWriteArrayList<>();
+		}
+		this.resultsAwareFilters = resultsAwareFilters;
 	}
 }

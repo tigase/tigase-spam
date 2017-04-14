@@ -1,0 +1,39 @@
+
+= Known spammers
+:author: Andrzej Wójcik
+:date: 2017-04-09
+
+To deal with spam it is required to filter every messages to verify if it is spam or not. Usually spammers are using same accounts to send bigger number of messages.
+This filter takes it as an advantage of this to reduce time required for filtering spam messages as when any other filter marks message as spam this filter will be notified and will mark senders jid as a spammer.
+This will result in a ban for any packet exchange with this user for configured <<ban-time,ban time>>.
+
+If user will send a burst of spam messages then he will be banned for configured ban time for every spam message, ie. if user would send 20 messages and ban time will be set to 15 minutes then users will be banned for 300 minutes (5 hours).
+
+This filter is identified by following id `known-spammers`.
+
+[ban-time]
+== Ban time
+Time in minutes for which user marked as spammer will not be able to exchange packets with any other users. By default this value is set to 15 minutes and if you would like to increase it to 30 minutes just add following line to `etc/init.properties` file:
+[source,properties]
+----
+'sess-man' () {
+    'spam-filter' () {
+        'known-spammers' () {
+            ban-time = 30
+        }
+    }
+}
+----
+
+== Print list of detected spammers
+It is possible to request filter to print full list of known spammer which are currently banned every minute. To do so, you need to set `print-spammers` property to `true`.
+[source,properties]
+----
+'sess-man' () {
+    'spam-filter' () {
+        'known-spammers' () {
+            print-spammers = true
+        }
+    }
+}
+----

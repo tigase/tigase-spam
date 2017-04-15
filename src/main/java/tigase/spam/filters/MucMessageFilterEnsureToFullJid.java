@@ -62,12 +62,17 @@ public class MucMessageFilterEnsureToFullJid
 					return true;
 				}
 			} else {
-				return false;
+				// Need to allow this kind of messages as I cannot confirm that they are messages which are incoming
+				// to the user. And even if they are incoming to the user and user is offline (disconnected) they
+				// will be dropped.
+				//
+				// `false` caused issues with disconnection and redelivery of packets not acked by stream management.
+				return true;
 			}
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Could not compare packet " + packet +
 					" destination with session bare jid as session is not authorized yet", ex);
-			return false;
+			return true;
 		}
 		return true;
 	}

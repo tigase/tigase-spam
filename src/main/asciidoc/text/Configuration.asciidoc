@@ -17,7 +17,7 @@ You can configure list of active SPAM filters by setting list of comma separate 
 .Setting list of active filters
 [source,properties]
 ----
-plugins-conf/spam-filter/filter-classes[s]=tigase.spam.filters.MessageFilterSameLongBody,tigase.spam.filters.MucMessageFilterEnsureToFullJid
+sess-man/plugins-conf/spam-filter/filter-classes[s]=tigase.spam.filters.MessageFilterSameLongBody,tigase.spam.filters.MucMessageFilterEnsureToFullJid
 ----
 
 == Sending error when +message+ is dropped

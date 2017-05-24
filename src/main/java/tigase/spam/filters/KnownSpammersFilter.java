@@ -49,6 +49,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 	private long cacheTime = 7 * 24 * 60;
 	private long banTime = 15;
 	private boolean printSpammers = false;
+	private long printSpammersFrequency = 24 * 60;
 	private boolean disableAccount = true;
 	private double disableAccountProbability = 1.0;
 	private long disabledAccounts = 0;
@@ -62,6 +63,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		banTime = (Long) props.getOrDefault("ban-time", 15L);
 		cacheTime = (Long) props.getOrDefault("cache-time", 7 * 24 * 60L);
 		printSpammers = (Boolean) props.getOrDefault("print-spammers", false);
+		printSpammersFrequency = (Long) props.getOrDefault("print-spammers-frequency", 24 * 60);
 		disableAccount = (Boolean) props.getOrDefault("disable-account", true);
 		timer.schedule(new TimerTask() {
 			@Override
@@ -69,6 +71,12 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 				KnownSpammersFilter.this.cleanUp();
 			}
 		}, 60 * 1000, 60 * 1000);
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				KnownSpammersFilter.this.printSpammers();
+			}
+		}, printSpammersFrequency * 60 * 1000, printSpammersFrequency * 60 * 1000);
 	}
 
 	@Override
@@ -130,18 +138,6 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 
 	private void cleanUp() {
 		if (!spammers.isEmpty()) {
-			if (log.isLoggable(Level.FINEST) || printSpammers) {
-				Map<Boolean, List<Spammer>> grouped = spammers.values()
-						.stream()
-						.collect(Collectors.groupingBy(spammer -> spammer.isLocalUser(), Collectors.toList()));
-
-				List<Spammer> list = grouped.getOrDefault(true, Collections.emptyList());
-				localSpammers = list.size();
-				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, true, list);
-				list = grouped.getOrDefault(false, Collections.emptyList());
-				remoteSpammers = list.size();
-				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, false, list);
-			}
 			spammers.entrySet()
 					.stream()
 					.filter(e -> e.getValue().hasProbabilityReached(disableAccountProbability))
@@ -152,6 +148,21 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 					.filter(e -> e.getValue().hasTimeoutPassed(cacheTime * 60 * 1000))
 					.map(e -> e.getKey())
 					.forEach(this.spammers::remove);
+		}
+	}
+
+	private void printSpammers() {
+		if (log.isLoggable(Level.FINEST) || printSpammers) {
+			Map<Boolean, List<Spammer>> grouped = spammers.values()
+					.stream()
+					.collect(Collectors.groupingBy(spammer -> spammer.isLocalUser(), Collectors.toList()));
+
+			List<Spammer> list = grouped.getOrDefault(true, Collections.emptyList());
+			localSpammers = list.size();
+			printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, true, list);
+			list = grouped.getOrDefault(false, Collections.emptyList());
+			remoteSpammers = list.size();
+			printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, false, list);
 		}
 	}
 

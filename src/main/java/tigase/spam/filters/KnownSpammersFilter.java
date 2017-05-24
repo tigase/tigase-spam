@@ -61,6 +61,8 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 	private long cacheTime = 7 * 24 * 60;
 	@ConfigField(desc = "Print spammers", alias = "print-spammers")
 	private boolean printSpammers = false;
+	@ConfigField(desc = "Print spammers frequency", alias = "print-spammers-frequency")
+	private long printSpammersFrequency = 24 * 60;
 	private boolean disableAccount = true;
 	private double disableAccountProbability = 1.0;
 	private long disabledAccounts = 0;
@@ -69,7 +71,8 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 
 	private Timer timer;
 
-	private TimerTask timerTask;
+	private TimerTask cleanUpTimerTask;
+	private TimerTask printSpammersTimerTask;
 	
 	@Override
 	public void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter) {
@@ -116,18 +119,29 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> collection) {
-		if (timerTask != null) {
-			timerTask.cancel();
+		if (cleanUpTimerTask != null) {
+			cleanUpTimerTask.cancel();
+			timer.purge();
+		}
+		if (printSpammersTimerTask != null) {
+			printSpammersTimerTask.cancel();
 			timer.purge();
 		}
 		if (timer != null) {
-			timerTask = new TimerTask() {
+			cleanUpTimerTask = new TimerTask() {
 				@Override
 				public void run() {
 					KnownSpammersFilter.this.cleanUp();
 				}
 			};
-			timer.schedule(timerTask, 60 * 1000, 60 * 1000);
+			timer.schedule(cleanUpTimerTask, 60 * 1000, 60 * 1000);
+			printSpammersTimerTask = new TimerTask() {
+				@Override
+				public void run() {
+					KnownSpammersFilter.this.printSpammers();
+				}
+			};
+			timer.schedule(printSpammersTimerTask, printSpammersFrequency * 60 * 1000, printSpammersFrequency * 60 * 1000);
 		}
 	}
 
@@ -153,18 +167,6 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 
 	private void cleanUp() {
 		if (!spammers.isEmpty()) {
-			if (log.isLoggable(Level.FINEST) || printSpammers) {
-				Map<Boolean, List<Spammer>> grouped = spammers.values()
-						.stream()
-						.collect(Collectors.groupingBy(spammer -> spammer.isLocalUser(), Collectors.toList()));
-
-				List<Spammer> list = grouped.getOrDefault(true, Collections.emptyList());
-				localSpammers = list.size();
-				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, true, list);
-				list = grouped.getOrDefault(false, Collections.emptyList());
-				remoteSpammers = list.size();
-				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, false, list);
-			}
 			spammers.entrySet()
 					.stream()
 					.filter(e -> e.getValue().hasProbabilityReached(disableAccountProbability))
@@ -175,6 +177,21 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 					.filter(e -> e.getValue().hasTimeoutPassed(cacheTime * 60 * 1000))
 					.map(e -> e.getKey())
 					.forEach(this.spammers::remove);
+		}
+	}
+
+	private void printSpammers() {
+		if (log.isLoggable(Level.FINEST) || printSpammers) {
+			Map<Boolean, List<Spammer>> grouped = spammers.values()
+					.stream()
+					.collect(Collectors.groupingBy(spammer -> spammer.isLocalUser(), Collectors.toList()));
+
+			List<Spammer> list = grouped.getOrDefault(true, Collections.emptyList());
+			localSpammers = list.size();
+			printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, true, list);
+			list = grouped.getOrDefault(false, Collections.emptyList());
+			remoteSpammers = list.size();
+			printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, false, list);
 		}
 	}
 

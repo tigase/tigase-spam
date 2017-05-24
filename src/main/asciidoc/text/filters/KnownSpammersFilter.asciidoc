@@ -64,3 +64,16 @@ It is possible to request filter to print full list of known spammer which are c
     }
 }
 ----
+
+== Frequency of printing list of spammers
+By default, list of detected spammers is printed to logs every day. If you wish you can adjust this value to 1 hour, then add following entry to `etc/init.properties` file:
+[source,DSL]
+----
+'sess-man' () {
+    'spam-filter' () {
+        'known-spammers' () {
+            print-spammers-frequency = 60
+        }
+    }
+}
+----

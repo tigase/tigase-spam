@@ -20,16 +20,16 @@
  */
 package tigase.spam.filters;
 
+import tigase.db.TigaseDBException;
 import tigase.server.Packet;
 import tigase.spam.ResultsAwareSpamFilter;
+import tigase.spam.SpamFilter;
 import tigase.stats.StatisticsList;
 import tigase.xmpp.BareJID;
 import tigase.xmpp.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,17 +44,25 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 
 	protected static final String ID = "known-spammers";
 
-	private ConcurrentHashMap<BareJID, Long> spammers = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<BareJID, Spammer> spammers = new ConcurrentHashMap<>();
 
+	private long cacheTime = 7 * 24 * 60;
 	private long banTime = 15;
 	private boolean printSpammers = false;
+	private boolean disableAccount = true;
+	private double disableAccountProbability = 1.0;
+	private long disabledAccounts = 0;
+	private long localSpammers = 0;
+	private long remoteSpammers = 0;
 
 	private final Timer timer = new Timer("known-spammers", true);
 
 	@Override
 	public void init(Map<String, Object> props) {
 		banTime = (Long) props.getOrDefault("ban-time", 15L);
+		cacheTime = (Long) props.getOrDefault("cache-time", 7 * 24 * 60L);
 		printSpammers = (Boolean) props.getOrDefault("print-spammers", false);
+		disableAccount = (Boolean) props.getOrDefault("disable-account", true);
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -64,7 +72,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 	}
 
 	@Override
-	public void identifiedSpam(Packet packet, XMPPResourceConnection session) {
+	public void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter) {
 		JID from = packet.getStanzaFrom();
 		if (from == null && session != null) {
 			from = session.getjid();
@@ -72,9 +80,11 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		if (from == null) {
 			return;
 		}
-		spammers.compute(from.getBareJID(), this::computeBanTimeout);
+		Spammer spammer = spammers.computeIfAbsent(from.getBareJID(), this::createSpammer);
+		spammer.spamDetected(filter);
 		try {
 			if (session != null && session.isAuthorized() && session.isUserId(from.getBareJID())) {
+				spammer.localUser();
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE, "Local user {0} was detected as a spammer, closing session for this user...",
 							new Object[]{from});
@@ -84,6 +94,18 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 			}
 		} catch (Exception ex) {
 			log.log(Level.FINE, "Could not logout user " + from, ex);
+		}
+		if (session != null && disableAccount && spammer.hasProbabilityReached(disableAccountProbability)) {
+			try {
+				if (log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "Disabling account {0} as it is most likely a spammer, probability > {1}",
+							new Object[]{from, disableAccountProbability});
+				}
+				session.getAuthRepository().setUserDisabled(from.getBareJID(), true);
+				disabledAccounts++;
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Failed to disable spammer account " + from + " due to repository exception", ex);
+			}
 		}
 	}
 
@@ -98,30 +120,54 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		if (from == null) {
 			return true;
 		}
-		return !spammers.containsKey(from.getBareJID());
+		Spammer spammer = spammers.get(from.getBareJID());
+		return spammer == null || spammer.hasTimeoutPassed(banTime * 60 * 1000);
 	}
-
-	private Long computeBanTimeout(BareJID jid, Long currValue) {
-		if (currValue == null) {
-			currValue = System.currentTimeMillis();
-		}
-
-		return currValue + (banTime * 60 * 1000);
+	
+	private Spammer createSpammer(BareJID spammerJid) {
+		return new Spammer(spammerJid);
 	}
 
 	private void cleanUp() {
 		if (!spammers.isEmpty()) {
 			if (log.isLoggable(Level.FINEST) || printSpammers) {
-				log.log(printSpammers ? Level.INFO : Level.FINEST, "Detected {0} spammers: {1}",
-						new Object[]{spammers.size(), spammers.keySet().stream().sorted(BareJID::compareTo).collect(
-								Collectors.toList())});
+				Map<Boolean, List<Spammer>> grouped = spammers.values()
+						.stream()
+						.collect(Collectors.groupingBy(spammer -> spammer.isLocalUser(), Collectors.toList()));
+
+				List<Spammer> list = grouped.getOrDefault(true, Collections.emptyList());
+				localSpammers = list.size();
+				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, true, list);
+				list = grouped.getOrDefault(false, Collections.emptyList());
+				remoteSpammers = list.size();
+				printSpammersGroup(printSpammers ? Level.INFO : Level.FINEST, false, list);
 			}
 			spammers.entrySet()
 					.stream()
-					.filter(e -> e.getValue() < System.currentTimeMillis())
+					.filter(e -> e.getValue().hasProbabilityReached(disableAccountProbability))
+					.map(e -> e.getKey())
+					.forEach(this.spammers::remove);
+			spammers.entrySet()
+					.stream()
+					.filter(e -> e.getValue().hasTimeoutPassed(cacheTime * 60 * 1000))
 					.map(e -> e.getKey())
 					.forEach(this.spammers::remove);
 		}
+	}
+
+	private void printSpammersGroup(Level level, boolean local, List<Spammer> spammers) {
+		
+		String name = local ? "local" : "remote";
+		Map<String, List<Spammer>> spammersByDomain = spammers.stream()
+				.collect(Collectors.groupingBy(spammer -> spammer.getJID().getDomain(), Collectors.toList()));
+		List<String> sortedDomains = spammersByDomain.keySet().stream().sorted().collect(Collectors.toList());
+		log.log(level, "Detected {0} {3} spammers for {1} domains {2}",
+				new Object[]{spammers.size(), spammersByDomain.size(), sortedDomains, name});
+		sortedDomains.forEach(domain -> {
+			log.log(level, "For {3} domain {0} detected {1} spammers: {2}",
+					new Object[]{domain, spammersByDomain.get(domain).size(),
+								 spammersByDomain.get(domain).stream().sorted().map(spammer -> spammer.toString()).collect(Collectors.joining(", ")), name});
+		});
 	}
 
 	@Override
@@ -129,6 +175,69 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		super.getStatistics(name, list);
 		if (list.checkLevel(Level.FINE)) {
 			list.add(name, getId() + "/Known spammers", spammers.size(), Level.FINE);
+			list.add(name, getId() + "/Known local spammers", localSpammers, Level.FINE);
+			list.add(name, getId() + "/Known remote spammers", remoteSpammers, Level.FINE);
+			list.add(name, getId() + "/Disabled accounts", disabledAccounts, Level.FINE);
+		}
+	}
+
+	private class Spammer implements Comparable<Spammer> {
+
+		private final BareJID jid;
+		private long lastSpamTimestamp = System.currentTimeMillis();
+		private long counter = 0;
+		private double probability = 0;
+		private boolean localUser;
+
+		public Spammer(BareJID jid) {
+			this.jid = jid;
+		}
+
+		public BareJID getJID() {
+			return jid;
+		}
+
+		public void spamDetected(SpamFilter reporter) {
+			lastSpamTimestamp = System.currentTimeMillis();
+			counter++;
+			probability += reporter.getSpamProbability();
+		}
+
+		public boolean hasTimeoutPassed(long timeout) {
+			return (System.currentTimeMillis() - lastSpamTimestamp) > timeout;
+		}
+
+		public boolean hasProbabilityReached(double value) {
+			return probability >= value;
+		}
+
+		public void localUser() {
+			localUser = true;
+		}
+
+		public boolean isLocalUser() {
+			return localUser;
+		}
+
+		@Override
+		public int compareTo(Spammer o) {
+			return jid.compareTo(o.jid);
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(jid.toString())
+					.append("[last_at: ")
+					.append(lastSpamTimestamp)
+					.append(", count: ")
+					.append(counter)
+					.append(", probability: ")
+					.append(probability)
+					.append(", banned: ")
+					.append(!hasTimeoutPassed(banTime * 60 * 1000))
+					.append("]");
+			return sb.toString();
 		}
 	}
 }

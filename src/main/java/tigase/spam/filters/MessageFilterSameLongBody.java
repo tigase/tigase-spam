@@ -112,6 +112,11 @@ public class MessageFilterSameLongBody extends AbstractSpamFilter {
 	}
 
 	@Override
+	public double getSpamProbability() {
+		return 0.4;
+	}
+
+	@Override
 	public void getStatistics(String name, StatisticsList list) {
 		super.getStatistics(name, list);
 		if (list.checkLevel(Level.FINE)) {

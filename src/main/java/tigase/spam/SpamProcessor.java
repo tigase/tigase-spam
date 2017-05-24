@@ -103,7 +103,7 @@ public class SpamProcessor
 					log.log(Level.FINEST, "filter {0} detected spam message {1}, sending error = {2}",
 							new Object[]{filter.getId(), packet, returnError});
 				}
-				resultsAwareFilters.forEach(resultAware -> resultAware.identifiedSpam(packet, session));
+				resultsAwareFilters.forEach(resultAware -> resultAware.identifiedSpam(packet, session, filter));
 				if (!returnError) {
 					packet.processedBy(ID);
 				}

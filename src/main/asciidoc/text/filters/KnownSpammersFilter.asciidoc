@@ -19,6 +19,21 @@ Time in minutes for which user marked as spammer will not be able to exchange pa
 sess-man/plugins-conf/spam-filter/known-spammers-ban-time[L]=30
 ----
 
+== Cache time
+Time in minutes for which user will be remembered as a spammer. It will be able to exchange messages with other users (after ban time passes), but if the situation repeats within this time and our algorithm will be sure that user is a spammer - it may disable local user account.
+[source,properties]
+----
+sess-man/plugins-conf/spam-filter/known-spammers-cache-time[L]=10080
+----
+
+== Disabling account
+If filter, depending on other filter reports, will establish that user is for sure a spammer it may not only ban user for some time, but it may disable that user account.
+This is done by default, if you wish to disable account deactivation add following line to `etc/init.properties` file:
+[source,properties]
+----
+sess-man/plugins-conf/spam-filter/known-spammers-disable-account[B]=false
+----
+
 == Print list of detected spammers
 It is possible to request filter to print full list of known spammer which are currently banned every minute. To do so, you need to set `known-spammers-print-spammers` property to `true`.
 [source,properties]

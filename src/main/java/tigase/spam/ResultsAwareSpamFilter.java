@@ -28,6 +28,6 @@ import tigase.xmpp.XMPPResourceConnection;
  */
 public interface ResultsAwareSpamFilter extends SpamFilter {
 
-	void identifiedSpam(Packet packet, XMPPResourceConnection session);
+	void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter);
 
 }

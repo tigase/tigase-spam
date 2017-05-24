@@ -36,4 +36,8 @@ public interface SpamFilter {
 	default void getStatistics(String name, StatisticsList list) {
 
 	}
+
+	default double getSpamProbability() {
+		return 1;
+	}
 }

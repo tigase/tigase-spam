@@ -3,7 +3,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
-
+        <groovyVersion>2.4.3</groovyVersion>
+        
         <sign-keystore>/path/to/jks.keystore</sign-keystore>
         <sign-alias>alias</sign-alias>
         <sign-storepass>storepass</sign-storepass>
@@ -105,13 +106,28 @@
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.2</version>
                 <configuration>
+                    <compilerId>groovy-eclipse-compiler</compilerId>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                    <showDeprecation>false</showDeprecation>
+                    <showDeprecation>true</showDeprecation>
+                    <!--<verbose>true</verbose>-->
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-compiler</artifactId>
+                        <version>2.9.1-01</version>
+                        <!--<extensions>true</extensions>-->
+                    </dependency>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-eclipse-batch</artifactId>
+                        <version>2.3.7-01</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -191,6 +207,14 @@
 
 
         <resources>
+            <resource>
+                <directory>src/main/groovy/tigase/admin/spam/</directory>
+                <targetPath>scripts/admin</targetPath>
+                <includes>
+                    <include>**/*.groovy</include>
+                </includes>
+            </resource>
+
             <resource>
                 <directory>src/main/asciidoc</directory>
                 <targetPath>documentation</targetPath>
@@ -453,6 +477,12 @@
             <artifactId>org.osgi.core</artifactId>
             <version>1.4.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovyVersion}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

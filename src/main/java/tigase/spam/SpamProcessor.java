@@ -53,7 +53,7 @@ public class SpamProcessor
 		extends AnnotatedXMPPProcessor
 		implements XMPPPreprocessorIfc, RegistrarBean {
 
-	protected static final String ID = "spam-filter";
+	public static final String ID = "spam-filter";
 
 	private static final Logger log = Logger.getLogger(SpamProcessor.class.getCanonicalName());
 

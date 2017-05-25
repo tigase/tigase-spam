@@ -179,7 +179,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 					.forEach(this.spammers::remove);
 		}
 	}
-
+	
 	private void printSpammers() {
 		if (log.isLoggable(Level.FINEST) || printSpammers) {
 			Map<Boolean, List<Spammer>> grouped = spammers.values()
@@ -221,7 +221,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		}
 	}
 
-	private class Spammer implements Comparable<Spammer> {
+	public class Spammer implements Comparable<Spammer> {
 
 		private final BareJID jid;
 		private long lastSpamTimestamp = System.currentTimeMillis();

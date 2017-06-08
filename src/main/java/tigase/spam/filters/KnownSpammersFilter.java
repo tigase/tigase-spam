@@ -63,7 +63,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		banTime = (Long) props.getOrDefault("ban-time", 15L);
 		cacheTime = (Long) props.getOrDefault("cache-time", 7 * 24 * 60L);
 		printSpammers = (Boolean) props.getOrDefault("print-spammers", false);
-		printSpammersFrequency = (Long) props.getOrDefault("print-spammers-frequency", 24 * 60);
+		printSpammersFrequency = (Long) props.getOrDefault("print-spammers-frequency", 24 * 60L);
 		disableAccount = (Boolean) props.getOrDefault("disable-account", true);
 		timer.schedule(new TimerTask() {
 			@Override

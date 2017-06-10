@@ -47,7 +47,7 @@ public abstract class AbstractSpamFilter implements SpamFilter {
 		boolean result = filterPacket(packet, session);
 
 		long time = System.currentTimeMillis() - start;
-		avgProcessingTime += time / 2L;
+		avgProcessingTime = (avgProcessingTime + time) / 2L;
 		totalProcessingTime += time;
 
 		if (!result) {

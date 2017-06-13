@@ -35,8 +35,8 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Id;
 
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -57,10 +57,10 @@ public class SpamProcessor
 
 	private static final Logger log = Logger.getLogger(SpamProcessor.class.getCanonicalName());
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private CopyOnWriteArrayList<SpamFilter> filters = new CopyOnWriteArrayList<>();
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private CopyOnWriteArrayList<ResultsAwareSpamFilter> resultsAwareFilters = new CopyOnWriteArrayList<>();
 
 	@ConfigField(desc = "Return error if packet is dropped", alias = "return-error")
@@ -104,22 +104,20 @@ public class SpamProcessor
 
 	public void setFilters(CopyOnWriteArrayList<SpamFilter> filters) {
 		if (filters == null) {
-			filters = new CopyOnWriteArrayList<>();
+			this.filters = new CopyOnWriteArrayList<>();
+		} else {
+			Optional<KnownSpammersFilter> knownSpammers = filters.stream()
+					.filter(filter -> filter instanceof KnownSpammersFilter)
+					.map(filter -> (KnownSpammersFilter) filter)
+					.findAny();
+
+			knownSpammers.ifPresent(filter -> {
+				filters.remove(filter);
+				filters.add(0, filter);
+			});
+
+			this.filters = filters;
 		}
-		KnownSpammersFilter knownSpammers = null;
-		Iterator<SpamFilter> it = filters.iterator();
-		while (it.hasNext()) {
-			SpamFilter filter = it.next();
-			if (filter instanceof KnownSpammersFilter) {
-				knownSpammers = (KnownSpammersFilter) filter;
-				it.remove();
-				break;
-			}
-		}
-		if (knownSpammers != null) {
-			filters.add(0, knownSpammers);
-		}
-		this.filters = filters;
 	}
 
 	public void setResultsAwareFilters(CopyOnWriteArrayList<ResultsAwareSpamFilter> resultsAwareFilters) {

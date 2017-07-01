@@ -20,6 +20,7 @@
  */
 package tigase.spam.filters;
 
+import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
@@ -94,21 +95,24 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 				}
 				session.putSessionData("error-key", "policy-violation");
 				session.logout();
+
+				if (spammer.hasProbabilityReached(disableAccountProbability)) {
+					try {
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE,
+									"Disabling account {0} as it is most likely a spammer, probability > {1}",
+									new Object[]{from, disableAccountProbability});
+						}
+						session.getAuthRepository()
+								.setAccountStatus(from.getBareJID(), AuthRepository.AccountStatus.disabled);
+						disabledAccounts++;
+					} catch (TigaseDBException ex) {
+						log.log(Level.WARNING, "Failed to disable spammer account " + from + " due to repository exception", ex);
+					}
+				}
 			}
 		} catch (Exception ex) {
 			log.log(Level.FINE, "Could not logout user " + from, ex);
-		}
-		if (session != null && disableAccount && spammer.hasProbabilityReached(disableAccountProbability)) {
-			try {
-				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Disabling account {0} as it is most likely a spammer, probability > {1}",
-							new Object[]{from, disableAccountProbability});
-				}
-				session.getAuthRepository().setUserDisabled(from.getBareJID(), true);
-				disabledAccounts++;
-			} catch (TigaseDBException ex) {
-				log.log(Level.WARNING, "Failed to disable spammer account " + from + " due to repository exception", ex);
-			}
 		}
 	}
 

@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import tigase.server.Packet;
 import tigase.stats.StatisticsList;
-import tigase.util.TigaseStringprepException;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
 import java.util.ArrayDeque;

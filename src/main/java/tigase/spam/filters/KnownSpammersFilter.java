@@ -31,8 +31,8 @@ import tigase.spam.ResultsAwareSpamFilter;
 import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
 import tigase.stats.StatisticsList;
-import tigase.xmpp.BareJID;
-import tigase.xmpp.JID;
+import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.*;

@@ -1,10 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
         <groovyVersion>2.4.3</groovyVersion>
-        
+
         <sign-keystore>/path/to/jks.keystore</sign-keystore>
         <sign-alias>alias</sign-alias>
         <sign-storepass>storepass</sign-storepass>
@@ -143,7 +143,8 @@
                         </Implementation-Version>
                         <Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})
                         </Implementation-Build>
-                        <Tigase-Required-Dependencies>tigase.server=${project.dependencies[0].version}</Tigase-Required-Dependencies>
+                        <Tigase-Required-Dependencies>tigase.server=${project.dependencies[0].version}
+                        </Tigase-Required-Dependencies>
                         <Bundle-Activator>tigase.spam.Activator</Bundle-Activator>
                         <Export-Package>tigase.spam.*</Export-Package>
                     </instructions>

@@ -29,14 +29,13 @@ import java.util.logging.Level;
 /**
  * Created by andrzej on 13.04.2017.
  */
-public abstract class AbstractSpamFilter implements SpamFilter {
+public abstract class AbstractSpamFilter
+		implements SpamFilter {
 
 	private long avgProcessingTime = 0L;
-	private long totalProcessingTime = 0L;
 	private long filteredMessages = 0L;
 	private long spamMessages = 0L;
-
-	protected abstract boolean filterPacket(Packet packet, XMPPResourceConnection session);
+	private long totalProcessingTime = 0L;
 
 	@Override
 	public boolean filter(Packet packet, XMPPResourceConnection session) {
@@ -65,4 +64,6 @@ public abstract class AbstractSpamFilter implements SpamFilter {
 			list.add(name, getId() + "/Total processing time", totalProcessingTime, Level.FINE);
 		}
 	}
+
+	protected abstract boolean filterPacket(Packet packet, XMPPResourceConnection session);
 }

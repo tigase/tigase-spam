@@ -87,7 +87,7 @@ public class SpamProcessor
 
 	@Override
 	public void register(Kernel kernel) {
-		
+
 	}
 
 	@Override

@@ -30,9 +30,9 @@ import tigase.spam.ResultsAwareSpamFilter;
 import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
 import tigase.stats.StatisticsList;
+import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
-import tigase.xmpp.XMPPResourceConnection;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,34 +46,30 @@ import static tigase.spam.filters.KnownSpammersFilter.ID;
  * Created by andrzej on 13.04.2017.
  */
 @Bean(name = ID, parent = SpamProcessor.class, active = true)
-public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAwareSpamFilter,
-																	   ConfigurationChangedAware, Initializable {
-
-	private static final Logger log = Logger.getLogger(KnownSpammersFilter.class.getCanonicalName());
+public class KnownSpammersFilter
+		extends AbstractSpamFilter
+		implements ResultsAwareSpamFilter, ConfigurationChangedAware, Initializable {
 
 	protected static final String ID = "known-spammers";
-
-	private ConcurrentHashMap<BareJID, Spammer> spammers = new ConcurrentHashMap<>();
-
+	private static final Logger log = Logger.getLogger(KnownSpammersFilter.class.getCanonicalName());
 	@ConfigField(desc = "Ban time", alias = "ban-time")
 	private long banTime = 15;
 	@ConfigField(desc = "Cache time", alias = "cache-time")
 	private long cacheTime = 7 * 24 * 60;
-	@ConfigField(desc = "Print spammers", alias = "print-spammers")
-	private boolean printSpammers = false;
-	@ConfigField(desc = "Print spammers frequency", alias = "print-spammers-frequency")
-	private long printSpammersFrequency = 24 * 60;
+	private TimerTask cleanUpTimerTask;
 	private boolean disableAccount = true;
 	private double disableAccountProbability = 1.0;
 	private long disabledAccounts = 0;
 	private long localSpammers = 0;
+	@ConfigField(desc = "Print spammers", alias = "print-spammers")
+	private boolean printSpammers = false;
+	@ConfigField(desc = "Print spammers frequency", alias = "print-spammers-frequency")
+	private long printSpammersFrequency = 24 * 60;
+	private TimerTask printSpammersTimerTask;
 	private long remoteSpammers = 0;
-
+	private ConcurrentHashMap<BareJID, Spammer> spammers = new ConcurrentHashMap<>();
 	private Timer timer;
 
-	private TimerTask cleanUpTimerTask;
-	private TimerTask printSpammersTimerTask;
-	
 	@Override
 	public void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter) {
 		JID from = packet.getStanzaFrom();
@@ -106,7 +102,8 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 								.setAccountStatus(from.getBareJID(), AuthRepository.AccountStatus.disabled);
 						disabledAccounts++;
 					} catch (TigaseDBException ex) {
-						log.log(Level.WARNING, "Failed to disable spammer account " + from + " due to repository exception", ex);
+						log.log(Level.WARNING,
+								"Failed to disable spammer account " + from + " due to repository exception", ex);
 					}
 				}
 			}
@@ -144,7 +141,8 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 					KnownSpammersFilter.this.printSpammers();
 				}
 			};
-			timer.schedule(printSpammersTimerTask, printSpammersFrequency * 60 * 1000, printSpammersFrequency * 60 * 1000);
+			timer.schedule(printSpammersTimerTask, printSpammersFrequency * 60 * 1000,
+						   printSpammersFrequency * 60 * 1000);
 		}
 	}
 
@@ -152,6 +150,17 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 	public void initialize() {
 		timer = new Timer("known-spammers", true);
 		beanConfigurationChanged(Collections.emptyList());
+	}
+
+	@Override
+	public void getStatistics(String name, StatisticsList list) {
+		super.getStatistics(name, list);
+		if (list.checkLevel(Level.FINE)) {
+			list.add(name, getId() + "/Known spammers", spammers.size(), Level.FINE);
+			list.add(name, getId() + "/Known local spammers", localSpammers, Level.FINE);
+			list.add(name, getId() + "/Known remote spammers", remoteSpammers, Level.FINE);
+			list.add(name, getId() + "/Disabled accounts", disabledAccounts, Level.FINE);
+		}
 	}
 
 	@Override
@@ -163,7 +172,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 		Spammer spammer = spammers.get(from.getBareJID());
 		return spammer == null || spammer.hasTimeoutPassed(banTime * 60 * 1000);
 	}
-	
+
 	private Spammer createSpammer(BareJID spammerJid) {
 		return new Spammer(spammerJid);
 	}
@@ -182,7 +191,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 					.forEach(this.spammers::remove);
 		}
 	}
-	
+
 	private void printSpammers() {
 		if (log.isLoggable(Level.FINEST) || printSpammers) {
 			Map<Boolean, List<Spammer>> grouped = spammers.values()
@@ -199,7 +208,7 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 	}
 
 	private void printSpammersGroup(Level level, boolean local, List<Spammer> spammers) {
-		
+
 		String name = local ? "local" : "remote";
 		Map<String, List<Spammer>> spammersByDomain = spammers.stream()
 				.collect(Collectors.groupingBy(spammer -> spammer.getJID().getDomain(), Collectors.toList()));
@@ -208,29 +217,21 @@ public class KnownSpammersFilter extends AbstractSpamFilter implements ResultsAw
 				new Object[]{spammers.size(), spammersByDomain.size(), sortedDomains, name});
 		sortedDomains.forEach(domain -> {
 			log.log(level, "For {3} domain {0} detected {1} spammers: {2}",
-					new Object[]{domain, spammersByDomain.get(domain).size(),
-								 spammersByDomain.get(domain).stream().sorted().map(spammer -> spammer.toString()).collect(Collectors.joining(", ")), name});
+					new Object[]{domain, spammersByDomain.get(domain).size(), spammersByDomain.get(domain)
+							.stream()
+							.sorted()
+							.map(spammer -> spammer.toString()).collect(Collectors.joining(", ")), name});
 		});
 	}
 
-	@Override
-	public void getStatistics(String name, StatisticsList list) {
-		super.getStatistics(name, list);
-		if (list.checkLevel(Level.FINE)) {
-			list.add(name, getId() + "/Known spammers", spammers.size(), Level.FINE);
-			list.add(name, getId() + "/Known local spammers", localSpammers, Level.FINE);
-			list.add(name, getId() + "/Known remote spammers", remoteSpammers, Level.FINE);
-			list.add(name, getId() + "/Disabled accounts", disabledAccounts, Level.FINE);
-		}
-	}
-
-	public class Spammer implements Comparable<Spammer> {
+	public class Spammer
+			implements Comparable<Spammer> {
 
 		private final BareJID jid;
-		private long lastSpamTimestamp = System.currentTimeMillis();
 		private long counter = 0;
-		private double probability = 0;
+		private long lastSpamTimestamp = System.currentTimeMillis();
 		private boolean localUser;
+		private double probability = 0;
 
 		public Spammer(BareJID jid) {
 			this.jid = jid;

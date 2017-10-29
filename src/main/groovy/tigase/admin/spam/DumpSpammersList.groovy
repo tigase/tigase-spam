@@ -38,13 +38,19 @@ import tigase.spam.filters.KnownSpammersFilter
 import java.util.stream.Collectors
 
 def sessMan = (SessionManager) component
-def p = (Packet)packet
-def admins = (Set)adminsSet
+def p = (Packet) packet
+def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
 SpamProcessor spamProcessor = sessMan.preProcessors.get(SpamProcessor.ID);
-println("found spamProcessor = " + spamProcessor + " with filters = " + spamProcessor.filters.stream().map({filter -> filter.getClass().getCanonicalName()}).collect(Collectors.toList()));
-Optional<KnownSpammersFilter> knownSpammersFilter = spamProcessor == null ? Optional.empty() : spamProcessor.filters.stream().filter({ filter -> filter instanceof KnownSpammersFilter}).map({filter -> (KnownSpammersFilter) filter}).findAny();
+println("found spamProcessor = " + spamProcessor + " with filters = " + spamProcessor.filters.stream().
+		map({ filter -> filter.getClass().getCanonicalName() }).
+		collect(Collectors.toList()));
+Optional<KnownSpammersFilter> knownSpammersFilter = spamProcessor == null ? Optional.empty() :
+													spamProcessor.filters.stream().
+															filter({ filter -> filter instanceof KnownSpammersFilter }).
+															map({ filter -> (KnownSpammersFilter) filter }).
+															findAny();
 
 def FILE_PATH = "file";
 def FORM_TYPE = "dump-spammers";
@@ -58,17 +64,18 @@ def getSpammersByTypeAndDomain = { KnownSpammersFilter filter ->
 	return filter.spammers.values().
 			stream().
 			collect(Collectors.groupingBy({ spammer -> spammer.isLocalUser() },
-										  Collectors.groupingBy({ spammer -> spammer.getJID().getDomain() }, Collectors.toList())));
+										  Collectors.groupingBy({ spammer -> spammer.getJID().getDomain() },
+																Collectors.toList())));
 }
 
 Command.addHiddenField(result, "form-type", FORM_TYPE);
 
 if (!isServiceAdmin) {
 	Command.addTextField(result, "Error", "You are not service administrator");
-}
-else if (knownSpammersFilter.isPresent()) {
+} else if (knownSpammersFilter.isPresent()) {
 	if (formType == null) {
-		Command.addInstructions(result, "Pass name of a file to which spammers list should be saved or leave blank to receive spammers list within response");
+		Command.addInstructions(result,
+								"Pass name of a file to which spammers list should be saved or leave blank to receive spammers list within response");
 		Command.addFieldValue(result, FILE_PATH, "", "text-single", "File");
 	} else if (filepath == null) {
 		Map<Boolean, Map<String, List<KnownSpammersFilter.Spammer>>> spammers = getSpammersByTypeAndDomain(
@@ -78,11 +85,10 @@ else if (knownSpammersFilter.isPresent()) {
 				return e.getKey() + ": " + e.getValue().stream().map({ spammer -> spammer.getJID().toString() }).
 						sorted().
 						collect(Collectors.joining(", "));
-			}).toArray({ size -> new String[size]});
+			}).toArray({ size -> new String[size] });
 			Command.addFieldMultiValue(result, local ? "Local domains" : "Remote domains", values);
 		});
-	}
-	else {
+	} else {
 		def file = new File(filepath);
 		if (file.exists()) {
 			// handle it somehow?
@@ -101,10 +107,10 @@ else if (knownSpammersFilter.isPresent()) {
 					}
 					domains.entrySet().stream().sorted({ e -> e.getKey() }).forEach({ e ->
 						file << e.getKey() << ": " << e.getValue().
-											stream().
-											map({ spammer -> spammer.getJID().toString() }).
-											sorted().
-											collect(Collectors.joining(", ")) << "\n";
+								stream().
+								map({ spammer -> spammer.getJID().toString() }).
+								sorted().
+								collect(Collectors.joining(", ")) << "\n";
 					})
 				});
 				Command.addTextField(result, "Success", "Spammers list dumped to " + file.getAbsolutePath());

@@ -37,9 +37,8 @@ import java.util.logging.Logger;
 public class MucMessageFilterEnsureToFullJid
 		extends AbstractSpamFilter {
 
-	private static final Logger log = Logger.getLogger(MucMessageFilterEnsureToFullJid.class.getCanonicalName());
-
 	protected static final String ID = "muc-message-ensure-to-full-jid";
+	private static final Logger log = Logger.getLogger(MucMessageFilterEnsureToFullJid.class.getCanonicalName());
 
 	@Override
 	public String getId() {

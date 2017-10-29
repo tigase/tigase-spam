@@ -41,32 +41,39 @@ import java.util.logging.Logger;
  * Created by andrzej on 08.04.2017.
  */
 @Bean(name = MessageFilterSameLongBody.ID, parent = SpamProcessor.class, active = true)
-public class MessageFilterSameLongBody extends AbstractSpamFilter {
-
-	private static final Logger log = Logger.getLogger(MessageFilterSameLongBody.class.getCanonicalName());
-
-	private static final Charset CHARSET_UTF8 = Charset.forName("utf-8");
+public class MessageFilterSameLongBody
+		extends AbstractSpamFilter {
 
 	protected static final String ID = "message-same-long-body";
-
-	private final ConcurrentHashMap<String,Integer> counter = new ConcurrentHashMap<>();
-
+	private static final Logger log = Logger.getLogger(MessageFilterSameLongBody.class.getCanonicalName());
+	private static final Charset CHARSET_UTF8 = Charset.forName("utf-8");
+	private final AtomicBoolean cleanerRunning = new AtomicBoolean(false);
+	private final ConcurrentHashMap<String, Integer> counter = new ConcurrentHashMap<>();
 	@ConfigField(desc = "Check message with body bigger that this limit", alias = "body-size")
 	private int longMessageSize = 100;
-
 	@ConfigField(desc = "Limit size of message counter cache", alias = "counter-size-limit")
 	private int messageCounterSizeLimit = 10000;
-
 	@ConfigField(desc = "Limit number of message with same body", alias = "number-limit")
 	private int messageNumberLimit = 20;
-
-	private final AtomicBoolean cleanerRunning = new AtomicBoolean(false);
 
 	@Override
 	public String getId() {
 		return ID;
 	}
-	
+
+	@Override
+	public double getSpamProbability() {
+		return 0.4;
+	}
+
+	@Override
+	public void getStatistics(String name, StatisticsList list) {
+		super.getStatistics(name, list);
+		if (list.checkLevel(Level.FINE)) {
+			list.add(name, getId() + "/Cache size", counter.size(), Level.FINE);
+		}
+	}
+
 	@Override
 	protected boolean filterPacket(Packet packet, XMPPResourceConnection session) {
 		if (packet.getElemName() != Message.ELEM_NAME || packet.getType() == StanzaType.groupchat) {
@@ -109,20 +116,8 @@ public class MessageFilterSameLongBody extends AbstractSpamFilter {
 		return true;
 	}
 
-	@Override
-	public double getSpamProbability() {
-		return 0.4;
-	}
-
-	@Override
-	public void getStatistics(String name, StatisticsList list) {
-		super.getStatistics(name, list);
-		if (list.checkLevel(Level.FINE)) {
-			list.add(name, getId() + "/Cache size", counter.size(), Level.FINE);
-		}
-	}
-
-	private class CleanerTask extends Thread {
+	private class CleanerTask
+			extends Thread {
 
 		public CleanerTask() {
 			super(ID + "-cleaner-task");

@@ -32,9 +32,15 @@ import static tigase.spam.filters.MessageErrorFilterEnsureErrorChild.ID;
  * Created by andrzej on 13.04.2017.
  */
 @Bean(name = ID, parent = SpamProcessor.class, active = true)
-public class MessageErrorFilterEnsureErrorChild extends AbstractSpamFilter {
+public class MessageErrorFilterEnsureErrorChild
+		extends AbstractSpamFilter {
 
 	protected static final String ID = "message-error-ensure-error-child";
+
+	@Override
+	public String getId() {
+		return ID;
+	}
 
 	@Override
 	protected boolean filterPacket(Packet packet, XMPPResourceConnection session) {
@@ -47,10 +53,5 @@ public class MessageErrorFilterEnsureErrorChild extends AbstractSpamFilter {
 		}
 
 		return false;
-	}
-
-	@Override
-	public String getId() {
-		return ID;
 	}
 }

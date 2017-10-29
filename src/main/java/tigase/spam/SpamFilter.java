@@ -31,7 +31,7 @@ public interface SpamFilter {
 	boolean filter(Packet packet, XMPPResourceConnection session);
 
 	String getId();
-	
+
 	default void getStatistics(String name, StatisticsList list) {
 
 	}

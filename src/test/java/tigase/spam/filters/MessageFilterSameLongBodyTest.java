@@ -43,11 +43,10 @@ public class MessageFilterSameLongBodyTest {
 	public void test() throws TigaseStringprepException, InterruptedException {
 		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
 
-
 		long start = System.currentTimeMillis();
 
 		executeTest(() -> {
-			for (int i=0; i < 50; i++) {
+			for (int i = 0; i < 50; i++) {
 				long begin = System.currentTimeMillis();
 				for (int j = 0; j < 10000; j++) {
 					try {
@@ -65,7 +64,8 @@ public class MessageFilterSameLongBodyTest {
 						System.out.println(rec.toString());
 					});
 				}
-				System.out.println("10000 messages in " + (System.currentTimeMillis() - begin) + "ms, " + (System.currentTimeMillis() - begin)/10000 + " per message");
+				System.out.println("10000 messages in " + (System.currentTimeMillis() - begin) + "ms, " +
+										   (System.currentTimeMillis() - begin) / 10000 + " per message");
 			}
 		});
 
@@ -74,7 +74,7 @@ public class MessageFilterSameLongBodyTest {
 
 	public void executeTest(Runnable task) throws InterruptedException {
 		Queue<Thread> threads = new ArrayDeque<>();
-		for (int i=0; i<Runtime.getRuntime().availableProcessors() * 8; i++) {
+		for (int i = 0; i < Runtime.getRuntime().availableProcessors() * 8; i++) {
 			Thread thread = new Thread(task);
 			thread.start();
 			threads.offer(thread);
@@ -91,14 +91,8 @@ public class MessageFilterSameLongBodyTest {
 	}
 
 	public Element createSpamMessageEl() {
-		return new Element("message", new Element[] {
-				new Element("body", SPAM_MESSAGE)
-		}, new String[] {
-				"from", "to"
-		}, new String[] {
-				"spammer@example.com", "recipient@example.com"
-		});
+		return new Element("message", new Element[]{new Element("body", SPAM_MESSAGE)}, new String[]{"from", "to"},
+						   new String[]{"spammer@example.com", "recipient@example.com"});
 	}
-
 
 }

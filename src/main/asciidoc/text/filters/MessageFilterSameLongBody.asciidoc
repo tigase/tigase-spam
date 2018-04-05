@@ -25,7 +25,7 @@ You can also check messages with smaller body (ie. only 50 chars) by setting `bo
 'sess-man' () {
     'spam-filter' () {
         'message-same-long-body' () {
-            body-size = 50
+            'body-size' = 50
         }
     }
 }
@@ -41,7 +41,7 @@ By default we allow 20 messages with same body to be processed by +SessionManage
 'sess-man' () {
     'spam-filter' () {
         'message-same-long-body' () {
-            number-limit = 10
+            'number-limit' = 10
         }
     }
 }
@@ -57,7 +57,7 @@ To change size of counters cache assign proper value to `counter-size-limit`.
 'sess-man' () {
     'spam-filter' () {
         'message-same-long-body' () {
-            counter-size-limit = 1000000
+            'counter-size-limit' = 1000000
         }
     }
 }

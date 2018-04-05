@@ -80,7 +80,9 @@ public class KnownSpammersFilter
 			return;
 		}
 		Spammer spammer = spammers.computeIfAbsent(from.getBareJID(), this::createSpammer);
-		spammer.spamDetected(filter);
+		if (filter != this) {
+			spammer.spamDetected(filter);
+		}
 		try {
 			if (session != null && session.isAuthorized() && session.isUserId(from.getBareJID())) {
 				spammer.localUser();
@@ -115,6 +117,11 @@ public class KnownSpammersFilter
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public double getSpamProbability() {
+		return 0;
 	}
 
 	@Override

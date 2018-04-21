@@ -107,8 +107,10 @@ public class PresenceSubscribeFilter
 				BareJID from = null;
 				if (packet.getStanzaFrom() != null) {
 					from = packet.getStanzaFrom().getBareJID();
-				} else {
+				} else if (session != null) {
 					from = session.getBareJID();
+				} else {
+					return true;
 				}
 				Counter counter = counters.computeIfAbsent(from, x -> new Counter());
 				return counter.check(numberOfAllowedRequestsPerMinute);

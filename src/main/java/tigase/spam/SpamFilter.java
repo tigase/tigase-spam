@@ -1,8 +1,6 @@
-/*
- * SpamFilter.java
- *
- * Tigase Jabber/XMPP Server - SPAM Filter
- * Copyright (C) 2004-2017 "Tigase, Inc." <office@tigase.com>
+/**
+ * Tigase Spam Filter - SPAM filters for Tigase XMPP Server
+ * Copyright (C) 2017 Tigase, Inc. (office@tigase.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by

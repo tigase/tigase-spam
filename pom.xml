@@ -38,8 +38,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://repository.tigase.org/git/tigase-spam.git</connection>
-        <developerConnection>scm:git:https://repository.tigase.org/git/tigase-spam.git</developerConnection>
+        <connection>scm:git:${scm_repo_base}/tigase-spam</connection>
+        <developerConnection>scm:git:${scm_repo_base}/tigase-spam</developerConnection>
         <url>https://projects.tigase.org/projects/tigase-spam/repository</url>
         <tag>HEAD</tag>
     </scm>
@@ -148,4 +148,11 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>tigase</id>
+            <url>http://maven-repo.tigase.org/repository/tigase</url>
+        </repository>
+    </repositories>
 </project>

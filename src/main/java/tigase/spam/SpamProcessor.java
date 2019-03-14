@@ -45,7 +45,7 @@ import static tigase.spam.SpamProcessor.ID;
  * Created by andrzej on 08.04.2017.
  */
 @Id(ID)
-@Bean(name = ID, parent = SessionManager.class, active = false)
+@Bean(name = ID, parent = SessionManager.class, active = true)
 public class SpamProcessor
 		extends AnnotatedXMPPProcessor
 		implements XMPPPreprocessorIfc, RegistrarBean {

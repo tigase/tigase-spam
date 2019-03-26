@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 08.04.2017.
  */
-@Bean(name = MucMessageFilterEnsureToFullJid.ID, parent = SpamProcessor.class, active = true)
+@Bean(name = MucMessageFilterEnsureToFullJid.ID, parent = SpamProcessor.class, active = false)
 public class MucMessageFilterEnsureToFullJid
 		extends AbstractSpamFilter {
 

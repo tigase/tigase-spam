@@ -84,6 +84,12 @@ public class MessageFilterSameLongBody
 				return true;
 			}
 
+			if (packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
+					packet.getElemChild("openpgp", "urn:xmpp:openpgp:0") != null) {
+				// message may be encrypted, ignoring body SPAM check is it is unreliable.
+				return true;
+			}
+
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			String hash = Algorithms.bytesToHex(md.digest(body.getBytes(CHARSET_UTF8)));
 

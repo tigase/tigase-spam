@@ -27,6 +27,7 @@ import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
 import tigase.spam.filters.KnownSpammersFilter;
 import tigase.stats.StatisticsList;
+import tigase.vhosts.VHostManager;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
@@ -60,6 +61,9 @@ public class SpamProcessor
 	@Inject(nullAllowed = true)
 	private CopyOnWriteArrayList<ResultsAwareSpamFilter> resultsAwareFilters = new CopyOnWriteArrayList<>();
 
+	@Inject(nullAllowed = false)
+	private VHostManager vHostManager;
+
 	@ConfigField(desc = "Return error if packet is dropped", alias = "return-error")
 	private boolean returnError = false;
 
@@ -67,6 +71,9 @@ public class SpamProcessor
 	public boolean preProcess(Packet packet, XMPPResourceConnection session,
 							  NonAuthUserRepository nonAuthUserRepository, Queue<Packet> queue,
 							  Map<String, Object> map) {
+		if (packet.getStanzaFrom() != null && packet.getStanzaFrom().getLocalpart() == null && vHostManager.getDefVHostItem().equals(packet.getStanzaFrom().getBareJID())) {
+			return false;
+		}
 		for (SpamFilter filter : filters) {
 			if (!filter.filter(packet, session)) {
 				if (log.isLoggable(Level.FINEST)) {

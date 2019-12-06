@@ -1,4 +1,4 @@
-/**
+/*
  * Tigase Spam Filter - SPAM filters for Tigase XMPP Server
  * Copyright (C) 2017 Tigase, Inc. (office@tigase.com)
  *

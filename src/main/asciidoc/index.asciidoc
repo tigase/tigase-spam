@@ -19,3 +19,5 @@ include::text/filters/MessageErrorFilterEnsureErrorChild.asciidoc[leveloffset=+2
 include::text/filters/MucMessageFilterEnsureToFullJid.asciidoc[leveloffset=+2]
 include::text/filters/KnownSpammersFilter.asciidoc[leveloffset=+2]
 include::text/filters/PresenceSubscribeFilter.asciidoc[leveloffset=+2]
+
+include::text/Development.asciidoc[leveloffset=+1]

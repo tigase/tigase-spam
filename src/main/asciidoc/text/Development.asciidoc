@@ -12,10 +12,10 @@ Each class used as a filter by `SpamProcessor` needs to implement `SpamFilter` i
 There are 3 important methods which need to be implemented by in `SpamFilter` interface:
 
 * `String getId()` - returns id of a filter
-* `double getSpamProbability()` - returns probability of sender being a spammer after detection of a single message which is blocked _(from 0.0 to 1.0 where 1.0 means that it is a spammer)
-* `boolean filter(Packet packet, XMPPResourceConnection session)` - method checking if a stanza is a spam (return false to stop stanza from being delivered)
+* `double getSpamProbability()` - returns probability of sender being a spammer after detection of a single message which is blocked _(from 0.0 to 1.0 where 1.0 means that it is a spammer)_
+* `boolean filter(Packet packet, XMPPResourceConnection session)` - method checking if a stanza is a spam (return `false` to stop stanza from being delivered)
 
-Simple filter with id `dummy-detector` which would look for messages with text `dummy`, block them and them mark sender as a spammer after 5 messages would be:
+Simple filter with id `dummy-detector` which would look for messages with text `dummy`, block them and then mark sender as a spammer after 5 messages would look like this:
 
 .Example filter
 [source,java]

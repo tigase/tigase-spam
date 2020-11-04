@@ -28,10 +28,12 @@ import tigase.server.xmppsession.SessionManager;
 import tigase.spam.filters.KnownSpammersFilter;
 import tigase.stats.StatisticsList;
 import tigase.vhosts.VHostManager;
+import tigase.xmpp.SpamReportsConsumer;
 import tigase.xmpp.XMPPPreprocessorIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +51,7 @@ import static tigase.spam.SpamProcessor.ID;
 @Bean(name = ID, parent = SessionManager.class, active = true)
 public class SpamProcessor
 		extends AnnotatedXMPPProcessor
-		implements XMPPPreprocessorIfc, RegistrarBean {
+		implements XMPPPreprocessorIfc, RegistrarBean, SpamReportsConsumer {
 
 	public static final String ID = "spam-filter";
 
@@ -129,5 +131,17 @@ public class SpamProcessor
 			resultsAwareFilters = new CopyOnWriteArrayList<>();
 		}
 		this.resultsAwareFilters = resultsAwareFilters;
+	}
+
+	@Override
+	public boolean spamReportedFrom(BareJID jid, ReportType type) {
+		boolean blocked = false;
+		for (ResultsAwareSpamFilter resultsAwareSpamFilter : resultsAwareFilters) {
+			blocked |= resultsAwareSpamFilter.reportedSpammer(jid);
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Spam from " + jid + " was reported resulting with account being disabled = " + blocked);
+		}
+		return blocked;
 	}
 }

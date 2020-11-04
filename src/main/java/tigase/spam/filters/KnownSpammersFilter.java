@@ -21,6 +21,7 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.server.Packet;
@@ -28,6 +29,7 @@ import tigase.spam.ResultsAwareSpamFilter;
 import tigase.spam.SpamFilter;
 import tigase.spam.SpamProcessor;
 import tigase.stats.StatisticsList;
+import tigase.vhosts.VHostManagerIfc;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -63,10 +65,24 @@ public class KnownSpammersFilter
 	private boolean printSpammers = false;
 	@ConfigField(desc = "Print spammers frequency", alias = "print-spammers-frequency")
 	private long printSpammersFrequency = 24 * 60;
+	@ConfigField(desc = "Reported spammer probability")
+	private double reportedSpammerProbability = 0.1;
 	private TimerTask printSpammersTimerTask;
 	private long remoteSpammers = 0;
 	private ConcurrentHashMap<BareJID, Spammer> spammers = new ConcurrentHashMap<>();
 	private Timer timer;
+	@Inject
+	private VHostManagerIfc vHostManager;
+
+	@Override
+	public boolean reportedSpammer(BareJID jid) {
+		Spammer spammer = spammers.computeIfAbsent(jid, this::createSpammer);
+		if (vHostManager.isLocalDomain(jid.getDomain())) {
+			spammer.localUser();
+		}
+		spammer.spamDetected(reportedSpammerProbability);
+		return spammer.hasProbabilityReached(disableAccountProbability);
+	}
 
 	@Override
 	public void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter) {
@@ -247,9 +263,13 @@ public class KnownSpammersFilter
 		}
 
 		public void spamDetected(SpamFilter reporter) {
+			this.spamDetected(reporter.getSpamProbability());
+		}
+
+		public void spamDetected(double probability) {
 			lastSpamTimestamp = System.currentTimeMillis();
 			counter++;
-			probability += reporter.getSpamProbability();
+			this.probability += probability;
 		}
 
 		public boolean hasTimeoutPassed(long timeout) {

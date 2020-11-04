@@ -19,12 +19,15 @@ package tigase.spam;
 
 import tigase.server.Packet;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.BareJID;
 
 /**
  * Created by andrzej on 13.04.2017.
  */
 public interface ResultsAwareSpamFilter
 		extends SpamFilter {
+
+	boolean reportedSpammer(BareJID jid);
 
 	void identifiedSpam(Packet packet, XMPPResourceConnection session, SpamFilter filter);
 

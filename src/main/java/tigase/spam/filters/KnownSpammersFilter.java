@@ -101,8 +101,8 @@ public class KnownSpammersFilter
 			if (session != null && session.isAuthorized() && session.isUserId(from.getBareJID())) {
 				spammer.localUser();
 				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Local user {0} was detected as a spammer, closing session for this user...",
-							new Object[]{from});
+					log.log(Level.FINE, "Local user {0} was detected as a spammer by filter: {1}, packet: {2}. Closing session for this user...",
+							new Object[]{from, filter, packet});
 				}
 				session.putSessionData("error-key", "policy-violation");
 				session.logout();
@@ -111,8 +111,8 @@ public class KnownSpammersFilter
 					try {
 						if (log.isLoggable(Level.FINE)) {
 							log.log(Level.FINE,
-									"Disabling account {0} as it is most likely a spammer, probability > {1}",
-									new Object[]{from, disableAccountProbability});
+									"Disabling account {0} as it is most likely a spammer, probability > {1}, filter: {2}",
+									new Object[]{from, disableAccountProbability, filter});
 						}
 						session.getAuthRepository()
 								.setAccountStatus(from.getBareJID(), AuthRepository.AccountStatus.disabled);

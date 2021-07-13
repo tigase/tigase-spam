@@ -64,4 +64,17 @@ public abstract class AbstractSpamFilter
 	}
 
 	protected abstract boolean filterPacket(Packet packet, XMPPResourceConnection session);
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("SpamFilter{");
+		sb.append("filter=").append(getId());
+		sb.append(", spamProbability=").append(getSpamProbability());
+		sb.append(", avgProcessingTime=").append(avgProcessingTime);
+		sb.append(", filteredMessages=").append(filteredMessages);
+		sb.append(", spamMessages=").append(spamMessages);
+		sb.append(", totalProcessingTime=").append(totalProcessingTime);
+		sb.append('}');
+		return sb.toString();
+	}
 }

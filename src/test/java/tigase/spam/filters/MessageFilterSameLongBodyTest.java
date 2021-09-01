@@ -28,6 +28,9 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.logging.Level;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by andrzej on 10.06.2017.
  */
@@ -35,6 +38,54 @@ import java.util.logging.Level;
 public class MessageFilterSameLongBodyTest {
 
 	public static final String SPAM_MESSAGE = "Here we need some long and ugly spam message!";
+
+	@Test
+	public void testSkipOpenPGP() throws TigaseStringprepException {
+		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
+
+		Packet packet = createSpamMessage();
+		packet.getElement()
+				.addChild(new Element("openpgp", new String[]{"xmlns"}, new String[]{"urn:xmpp:openpgp:0"}));
+		assertTrue(filter.shouldSkipBodyCheck(packet));
+	}
+
+	@Test
+	public void testSkipFallback() throws TigaseStringprepException {
+		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
+
+		Packet packet = createSpamMessage();
+		packet.getElement()
+				.addChild(new Element("fallback", new String[]{"xmlns"}, new String[]{"urn:xmpp:fallback:0"}));
+		assertTrue(filter.shouldSkipBodyCheck(packet));
+	}
+
+	@Test
+	public void testSkipOMEMO_old() throws TigaseStringprepException {
+		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
+
+		Packet packet = createSpamMessage();
+		packet.getElement()
+				.addChild(new Element("encrypted", new String[]{"xmlns"},
+									  new String[]{"eu.siacs.conversations.axolotl"}));
+		assertTrue(filter.shouldSkipBodyCheck(packet));
+	}
+
+	@Test
+	public void testSkipOMEMO_new() throws TigaseStringprepException {
+		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
+
+		Packet packet = createSpamMessage();
+		packet.getElement().addChild(new Element("encrypted", new String[]{"xmlns"}, new String[]{"urn:xmpp:omemo:1"}));
+		assertTrue(filter.shouldSkipBodyCheck(packet));
+	}
+
+	@Test
+	public void testNoSkip() throws TigaseStringprepException {
+		MessageFilterSameLongBody filter = new MessageFilterSameLongBody();
+
+		Packet packet = createSpamMessage();
+		assertFalse(filter.shouldSkipBodyCheck(packet));
+	}
 
 	@Test
 	public void test() throws TigaseStringprepException, InterruptedException {

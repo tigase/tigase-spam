@@ -24,6 +24,7 @@ import tigase.server.Packet;
 import tigase.spam.SpamProcessor;
 import tigase.stats.StatisticsList;
 import tigase.util.Algorithms;
+import tigase.xmpp.ElementMatcher;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 
@@ -53,6 +54,15 @@ public class MessageFilterSameLongBody
 	private int messageCounterSizeLimit = 10000;
 	@ConfigField(desc = "Limit number of message with same body", alias = "number-limit")
 	private int messageNumberLimit = 20;
+	@ConfigField(desc = "Skip checking OTR for spam", alias = "skip-otr-check")
+	private boolean skipOtrCheck = true;
+	@ConfigField(desc = "Rules for skipping checking body for spam", alias = "skip-check-rules")
+	private ElementMatcher[] skipMatchers = new ElementMatcher[]{
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "fallback"}, "urn:xmpp:fallback:0", true),
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "encrypted"}, "eu.siacs.conversations.axolotl", true),
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "openpgp"}, "urn:xmpp:openpgp:0", true),
+			new ElementMatcher(new String[] {Message.ELEM_NAME, "encrypted"}, "urn:xmpp:omemo:1", true)
+	};
 
 	@Override
 	public String getId() {
@@ -72,6 +82,16 @@ public class MessageFilterSameLongBody
 		}
 	}
 
+	protected boolean shouldSkipBodyCheck(Packet packet) {
+		for (ElementMatcher matcher : skipMatchers) {
+			if (matcher.matches(packet)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	protected boolean filterPacket(Packet packet, XMPPResourceConnection session) {
 		if (packet.getElemName() != Message.ELEM_NAME || packet.getType() == StanzaType.groupchat) {
@@ -84,10 +104,14 @@ public class MessageFilterSameLongBody
 				return true;
 			}
 
-			if (packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
-					packet.getElemChild("openpgp", "urn:xmpp:openpgp:0") != null) {
-				// message may be encrypted, ignoring body SPAM check is it is unreliable.
+			if (shouldSkipBodyCheck(packet)) {
 				return true;
+			}
+
+			if (skipOtrCheck) {
+				if (body.startsWith("?OTR?v23?")) {
+					return true;
+				}
 			}
 
 			MessageDigest md = MessageDigest.getInstance("SHA-256");

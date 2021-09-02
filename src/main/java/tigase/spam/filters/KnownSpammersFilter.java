@@ -93,7 +93,13 @@ public class KnownSpammersFilter
 		if (from == null) {
 			return;
 		}
-		Spammer spammer = spammers.computeIfAbsent(from.getBareJID(), this::createSpammer);
+		Spammer spammer = spammers.computeIfAbsent(from.getBareJID(), spammerJid -> {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "User {0} was detected as a spammer by filter: {1}, packet: {2}",
+						new Object[]{spammerJid, filter, packet});
+			}
+			return createSpammer(spammerJid);
+		});
 		if (filter != this) {
 			spammer.spamDetected(filter);
 		}

@@ -121,7 +121,7 @@ public class KnownSpammersFilter
 									new Object[]{from, disableAccountProbability, filter});
 						}
 						session.getAuthRepository()
-								.setAccountStatus(from.getBareJID(), AuthRepository.AccountStatus.disabled);
+								.setAccountStatus(from.getBareJID(), AuthRepository.AccountStatus.spam);
 						disabledAccounts++;
 					} catch (TigaseDBException ex) {
 						log.log(Level.WARNING,

@@ -35,6 +35,7 @@ import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
 import tigase.xmpp.impl.annotation.Id;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
@@ -65,6 +66,9 @@ public class SpamProcessor
 
 	@Inject(nullAllowed = false)
 	private VHostManager vHostManager;
+
+	@Inject(nullAllowed = true)
+	private KnownSpammersFilter knownSpammersFilter;
 
 	@ConfigField(desc = "Return error if packet is dropped", alias = "return-error")
 	private boolean returnError = false;
@@ -106,6 +110,10 @@ public class SpamProcessor
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
 		filters.forEach(filter -> filter.getStatistics(this.id(), list));
+	}
+
+	public Collection<KnownSpammersFilter.Spammer> getSpammers() {
+		return knownSpammersFilter.getSpammers();
 	}
 
 	public void setFilters(CopyOnWriteArrayList<SpamFilter> filters) {

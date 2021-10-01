@@ -190,6 +190,10 @@ public class KnownSpammersFilter
 		}
 	}
 
+	public Collection<Spammer> getSpammers() {
+		return Collections.unmodifiableCollection(spammers.values());
+	}
+
 	@Override
 	protected boolean filterPacket(Packet packet, XMPPResourceConnection session) {
 		JID from = packet.getStanzaFrom();

@@ -3,3 +3,5 @@
 /target/
 *.iml
 *.ipr
+src/main/restructured/locale/pl/LC_MESSAGES/*.mo
+src/main/restructured/_build/

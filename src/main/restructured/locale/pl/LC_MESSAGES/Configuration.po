@@ -1,0 +1,87 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-03 12:16-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../Configuration.rst:2
+msgid "Configuration"
+msgstr ""
+
+#: ../../Configuration.rst:4
+msgid ""
+"To enable default set of SPAM filters with default settings you need to "
+"enable SessionManager processor spam-filter:"
+msgstr ""
+
+#: ../../Configuration.rst:6
+msgid "**Enabling default SPAM filters.**"
+msgstr ""
+
+#: ../../Configuration.rst:15
+msgid "Changing active SPAM filters"
+msgstr ""
+
+#: ../../Configuration.rst:17
+msgid ""
+"You can configure active SPAM filters by setting enabling and disabling "
+"SPAM filters (subbeans of spam-filter processor bean)."
+msgstr ""
+
+#: ../../Configuration.rst:19
+msgid "**Enabling message-same-long-body filter.**"
+msgstr ""
+
+#: ../../Configuration.rst:30
+msgid "Sending error when packet is dropped"
+msgstr ""
+
+#: ../../Configuration.rst:32
+msgid ""
+"By default, due to nature of SPAM, you do not want to send error packet "
+"when SPAM packet is dropped as sending error back will:"
+msgstr ""
+
+#: ../../Configuration.rst:34
+msgid ""
+"increase traffic on a server (which in rare cases may lead to overload of"
+" a XMPP server)"
+msgstr ""
+
+#: ../../Configuration.rst:36
+msgid "notify spammer that it was not possible to delivery message"
+msgstr ""
+
+#: ../../Configuration.rst:38
+msgid ""
+"It is possible to configure spam-filter to send error back, by setting "
+"true to spam-filter return-error property:"
+msgstr ""
+
+#: ../../Configuration.rst:40
+msgid "**Allow sending error.**"
+msgstr ""
+
+#: ../../Configuration.rst:51
+msgid "Enabling logging of dropped messages"
+msgstr ""
+
+#: ../../Configuration.rst:53
+msgid ""
+"It is possible to enable logging of dropped messages by adding ``spam`` "
+"to comma separate list of values for ``--debug`` property."
+msgstr ""
+

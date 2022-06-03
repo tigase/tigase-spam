@@ -11,7 +11,7 @@ This filter is identified by following id ``known-spammers``.
 
 Time in minutes for which user marked as spammer will not be able to exchange packets with any other users. By default this value is set to 15 minutes and if you would like to increase it to 30 minutes just add following line to ``etc/init.properties`` file:
 
-.. code:: DSL
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -26,7 +26,7 @@ Cache time
 
 Time in minutes for which user will be remembered as a spammer. It will be able to exchange messages with other users (after ban time passes), but if the situation repeats within this time and our algorithm will be sure that user is a spammer - it may disable local user account.
 
-.. code:: DSL
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -41,7 +41,7 @@ Disabling account
 
 If filter, depending on other filter reports, will establish that user is for sure a spammer it may not only ban user for some time, but it may disable that user account. This is done by default, if you wish to disable account deactivation add following line to ``etc/init.properties`` file:
 
-.. code:: DSL
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -56,7 +56,7 @@ Print list of detected spammers
 
 It is possible to request filter to print full list of known spammer which are currently banned every minute. To do so, you need to set ``print-spammers`` property to ``true``.
 
-.. code:: DSL
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -71,7 +71,7 @@ Frequency of printing list of spammers
 
 By default, list of detected spammers is printed to logs every day. If you wish you can adjust this value to 1 hour, then add following entry to ``etc/init.properties`` file:
 
-.. code:: DSL
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {

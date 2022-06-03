@@ -5,7 +5,7 @@ To enable default set of SPAM filters with default settings you need to enable S
 
 **Enabling default SPAM filters.**
 
-.. code:: properties
+.. code:: text
 
    'sess-man () {
        'spam-filter' () {}
@@ -18,7 +18,7 @@ You can configure active SPAM filters by setting enabling and disabling SPAM fil
 
 **Enabling message-same-long-body filter.**
 
-.. code:: dsl
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -39,7 +39,7 @@ It is possible to configure spam-filter to send error back, by setting true to s
 
 **Allow sending error.**
 
-.. code:: properties
+.. code:: text
 
    'sess-man () {
        'spam-filter' () {
@@ -52,6 +52,6 @@ Enabling logging of dropped messages
 
 It is possible to enable logging of dropped messages by adding ``spam`` to comma separate list of values for ``--debug`` property.
 
-.. code:: propeties
+.. code:: text
 
    --debug=spam

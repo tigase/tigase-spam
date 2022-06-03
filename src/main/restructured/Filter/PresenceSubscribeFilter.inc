@@ -14,7 +14,7 @@ Be default filter allows 5 subscription requests to be sent from the single JID 
 
 **Setting filter to allow 7 subscription requests per minute.**
 
-.. code:: dsl
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {

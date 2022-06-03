@@ -20,7 +20,7 @@ You can also check messages with smaller body (ie. only 50 chars) by setting ``b
 
 **Setting filter to check message with body bigger that 50 chars.**
 
-.. code:: dsl
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -37,7 +37,7 @@ In most cases message with same body is sent to multiple users. Filter will coun
 
 **Setting number of allowed message to 10.**
 
-.. code:: dsl
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {
@@ -54,7 +54,7 @@ We process every message and for every body of message which body length exceeds
 
 **Increasing cache size to 1000000.**
 
-.. code:: dsl
+.. code:: text
 
    'sess-man' () {
        'spam-filter' () {

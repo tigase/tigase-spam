@@ -4,10 +4,17 @@ Tigase SPAM Filter - Version 2.3.0
 ==========================================
 
 .. toctree::
-   :titlesonly:
-   :numbered:
+   :maxdepth: 3
+   :numbered: 3
 
-   Spam_guide
+   Overview
+   Configuration
+   Filter/filter
+   Development
+
+
+
+
 
 
 

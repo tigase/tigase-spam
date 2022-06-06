@@ -1,0 +1,65 @@
+Same long message body
+--------------------------
+
+When there is a SPAM being sent using XMPP server in most cases number of messages with longer ``body`` size increases and in most cases every SPAM message contains same ``body`` part. This filter is identified by following id ``message-same-long-body``.
+
+Detection is based on:
+
+-  message body being longer that particular value
+
+-  multiple messages being sent with same long body
+
+Below is list of possible settings which may be modified to adjust this filter behaviour.
+
+Message body length
+^^^^^^^^^^^^^^^^^^^^^^^
+
+SPAM messages are usually longer messages (over 100 chars). To reduce overhead of filtering and memory required for filtering we check length of message body and process it further only if message exceeds declared message body length *(default: 100 chars)*.
+
+You can also check messages with smaller body (ie. only 50 chars) by setting ``body-size`` property to ``50``.
+
+**Setting filter to check message with body bigger that 50 chars.**
+
+.. code:: text
+
+   'sess-man' () {
+       'spam-filter' () {
+           'message-same-long-body' () {
+               'body-size' = 50
+           }
+       }
+   }
+
+Number of allowed message with same body
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In most cases message with same body is sent to multiple users. Filter will count messages with same body (which is bigger that declared message body length) and if it exceeds message number limit then any further message with same body will be detected and marked as SPAM. By default we allow 20 messages with same body to be processed by SessionManager. If you wish to change this limit set ``number-limit`` to appropriate value.
+
+**Setting number of allowed message to 10.**
+
+.. code:: text
+
+   'sess-man' () {
+       'spam-filter' () {
+           'message-same-long-body' () {
+               'number-limit' = 10
+           }
+       }
+   }
+
+Size of counters cache
+^^^^^^^^^^^^^^^^^^^^^^^
+
+We process every message and for every body of message which body length exceeds body length limit we needs to keep counter. This counters are kept in cache which size is configurable and by default equals ``10000``. To change size of counters cache assign proper value to ``counter-size-limit``.
+
+**Increasing cache size to 1000000.**
+
+.. code:: text
+
+   'sess-man' () {
+       'spam-filter' () {
+           'message-same-long-body' () {
+               'counter-size-limit' = 1000000
+           }
+       }
+   }

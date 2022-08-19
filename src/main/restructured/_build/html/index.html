@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tigase SPAM Filter - Version 2.3.0 &mdash; TigaseDoc 0.1 - dokumentacja</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="1. Overview" href="Overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> TigaseDoc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">2. Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Filter/filter.html">3. Filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">4. Development</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">TigaseDoc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Tigase SPAM Filter - Version 2.3.0</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tigase-spam-filter-version-2-3-0">
+<h1>Tigase SPAM Filter - Version 2.3.0<a class="headerlink" href="#tigase-spam-filter-version-2-3-0" title="Stały odnośnik do tego nagłówka"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">2. Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Configuration.html#changing-active-spam-filters">2.1. Changing active SPAM filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Configuration.html#sending-error-when-packet-is-dropped">2.2. Sending error when packet is dropped</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Configuration.html#enabling-logging-of-dropped-messages">2.3. Enabling logging of dropped messages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Filter/filter.html">3. Filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Filter/filter.html#same-long-message-body">3.1. Same long message body</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#message-body-length">3.1.1. Message body length</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#number-of-allowed-message-with-same-body">3.1.2. Number of allowed message with same body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#size-of-counters-cache">3.1.3. Size of counters cache</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Filter/filter.html#error-message-and-missing-error-child">3.2. Error message and missing &lt;error/&gt; child</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Filter/filter.html#groupchat-messages-sent-to-bare-jid">3.3. Groupchat messages sent to bare JID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Filter/filter.html#known-spammers">3.4. Known spammers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#cache-time">3.4.1. Cache time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#disabling-account">3.4.2. Disabling account</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#print-list-of-detected-spammers">3.4.3. Print list of detected spammers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#frequency-of-printing-list-of-spammers">3.4.4. Frequency of printing list of spammers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Filter/filter.html#presence-subscription-filter">3.5. Presence subscription filter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Filter/filter.html#number-of-allowed-subscription-requests-per-minute">3.5.1. Number of allowed subscription requests per minute</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">4. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Development.html#implementation-of-a-new-filter">4.1. Implementation of a new filter</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Overview.html" class="btn btn-neutral float-right" title="1. Overview" accesskey="n" rel="next">Następny <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2022, Tigase, Inc.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

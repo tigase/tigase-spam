@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3. Filters &mdash; TigaseDoc 0.1 - dokumentacja</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/translations.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="../genindex.html" />
+    <link rel="search" title="Szukaj" href="../search.html" />
+    <link rel="next" title="4. Development" href="../Development.html" />
+    <link rel="prev" title="2. Configuration" href="../Configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> TigaseDoc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Configuration.html">2. Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Filters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#same-long-message-body">3.1. Same long message body</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#message-body-length">3.1.1. Message body length</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#number-of-allowed-message-with-same-body">3.1.2. Number of allowed message with same body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#size-of-counters-cache">3.1.3. Size of counters cache</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#error-message-and-missing-error-child">3.2. Error message and missing &lt;error/&gt; child</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groupchat-messages-sent-to-bare-jid">3.3. Groupchat messages sent to bare JID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#known-spammers">3.4. Known spammers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cache-time">3.4.1. Cache time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#disabling-account">3.4.2. Disabling account</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#print-list-of-detected-spammers">3.4.3. Print list of detected spammers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#frequency-of-printing-list-of-spammers">3.4.4. Frequency of printing list of spammers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#presence-subscription-filter">3.5. Presence subscription filter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#number-of-allowed-subscription-requests-per-minute">3.5.1. Number of allowed subscription requests per minute</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Development.html">4. Development</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TigaseDoc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><span class="section-number">3. </span>Filters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Filter/filter.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="filters">
+<h1><span class="section-number">3. </span>Filters<a class="headerlink" href="#filters" title="Stały odnośnik do tego nagłówka"></a></h1>
+<p>In this section there is a list of available filters and detailed description of each filtering algorithm.</p>
+<section id="same-long-message-body">
+<h2><span class="section-number">3.1. </span>Same long message body<a class="headerlink" href="#same-long-message-body" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>When there is a SPAM being sent using XMPP server in most cases number of messages with longer <code class="docutils literal notranslate"><span class="pre">body</span></code> size increases and in most cases every SPAM message contains same <code class="docutils literal notranslate"><span class="pre">body</span></code> part. This filter is identified by following id <code class="docutils literal notranslate"><span class="pre">message-same-long-body</span></code>.</p>
+<p>Detection is based on:</p>
+<ul class="simple">
+<li><p>message body being longer that particular value</p></li>
+<li><p>multiple messages being sent with same long body</p></li>
+</ul>
+<p>Below is list of possible settings which may be modified to adjust this filter behaviour.</p>
+<section id="message-body-length">
+<h3><span class="section-number">3.1.1. </span>Message body length<a class="headerlink" href="#message-body-length" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>SPAM messages are usually longer messages (over 100 chars). To reduce overhead of filtering and memory required for filtering we check length of message body and process it further only if message exceeds declared message body length <em>(default: 100 chars)</em>.</p>
+<p>You can also check messages with smaller body (ie. only 50 chars) by setting <code class="docutils literal notranslate"><span class="pre">body-size</span></code> property to <code class="docutils literal notranslate"><span class="pre">50</span></code>.</p>
+<p><strong>Setting filter to check message with body bigger that 50 chars.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;message-same-long-body&#39; () {
+            &#39;body-size&#39; = 50
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="number-of-allowed-message-with-same-body">
+<h3><span class="section-number">3.1.2. </span>Number of allowed message with same body<a class="headerlink" href="#number-of-allowed-message-with-same-body" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>In most cases message with same body is sent to multiple users. Filter will count messages with same body (which is bigger that declared message body length) and if it exceeds message number limit then any further message with same body will be detected and marked as SPAM. By default we allow 20 messages with same body to be processed by SessionManager. If you wish to change this limit set <code class="docutils literal notranslate"><span class="pre">number-limit</span></code> to appropriate value.</p>
+<p><strong>Setting number of allowed message to 10.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;message-same-long-body&#39; () {
+            &#39;number-limit&#39; = 10
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="size-of-counters-cache">
+<h3><span class="section-number">3.1.3. </span>Size of counters cache<a class="headerlink" href="#size-of-counters-cache" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>We process every message and for every body of message which body length exceeds body length limit we needs to keep counter. This counters are kept in cache which size is configurable and by default equals <code class="docutils literal notranslate"><span class="pre">10000</span></code>. To change size of counters cache assign proper value to <code class="docutils literal notranslate"><span class="pre">counter-size-limit</span></code>.</p>
+<p><strong>Increasing cache size to 1000000.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;message-same-long-body&#39; () {
+            &#39;counter-size-limit&#39; = 1000000
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+</section>
+<section id="error-message-and-missing-error-child">
+<h2><span class="section-number">3.2. </span>Error message and missing &lt;error/&gt; child<a class="headerlink" href="#error-message-and-missing-error-child" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>Some of SPAM messages are sent as stanzas which are invalid if we compare them with XMPP specification, ie. <code class="docutils literal notranslate"><span class="pre">&lt;message/&gt;</span></code> stanza with <code class="docutils literal notranslate"><span class="pre">type</span></code> attribute set to <code class="docutils literal notranslate"><span class="pre">error</span></code> are sent without child element <code class="docutils literal notranslate"><span class="pre">&lt;error/&gt;</span></code> which is required for all packets of type <code class="docutils literal notranslate"><span class="pre">error</span></code>. This filter detects this kind of messages and marks them as SPAM.</p>
+<p>This filter is identified by following id <code class="docutils literal notranslate"><span class="pre">message-error-ensure-error-child</span></code>.</p>
+</section>
+<section id="groupchat-messages-sent-to-bare-jid">
+<h2><span class="section-number">3.3. </span>Groupchat messages sent to bare JID<a class="headerlink" href="#groupchat-messages-sent-to-bare-jid" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>In some cases SPAM messages are being sent as groupchat messages (messages with <code class="docutils literal notranslate"><span class="pre">type</span></code> attribute set to <code class="docutils literal notranslate"><span class="pre">groupchat</span></code>). With this type of messages we cannot use filtering based on number of message sent with same body as in case of MUC messages we must accept a lot of messages with same body, because there may be many users which are participants of same MUC room and should receive same message.</p>
+<p>To address this issue we decided to drop all groupchat messages which are sent to our server XMPP users with <code class="docutils literal notranslate"><span class="pre">to</span></code> attribute set to bare jid, as real MUC component is aware of user resources which joined particular room and will send messages only to this particular resource by addressing message with full jid. This filter is identified by following id <code class="docutils literal notranslate"><span class="pre">muc-message-ensure-to-full-jid</span></code>.</p>
+</section>
+<section id="known-spammers">
+<h2><span class="section-number">3.4. </span>Known spammers<a class="headerlink" href="#known-spammers" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>To deal with spam it is required to filter every messages to verify if it is spam or not. Usually spammers are using same accounts to send bigger number of messages. This filter takes it as an advantage of this to reduce time required for filtering spam messages as when any other filter marks message as spam this filter will be notified and will mark senders jid as a spammer. This will result in a ban for any packet exchange with this user for configured <a class="reference external" href="#ban-time">ban time</a>.</p>
+<p>If user will send a burst of spam messages then he will be banned for configured ban time for every spam message, ie. if user would send 20 messages and ban time will be set to 15 minutes then users will be banned for 300 minutes (5 hours).</p>
+<p>This filter is identified by following id <code class="docutils literal notranslate"><span class="pre">known-spammers</span></code>.</p>
+<p><strong>Ban time</strong></p>
+<p>Time in minutes for which user marked as spammer will not be able to exchange packets with any other users. By default this value is set to 15 minutes and if you would like to increase it to 30 minutes just add following line to <code class="docutils literal notranslate"><span class="pre">etc/init.properties</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;known-spammers&#39; () {
+            ban-time = 30
+        }
+    }
+}
+</pre></div>
+</div>
+<section id="cache-time">
+<h3><span class="section-number">3.4.1. </span>Cache time<a class="headerlink" href="#cache-time" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>Time in minutes for which user will be remembered as a spammer. It will be able to exchange messages with other users (after ban time passes), but if the situation repeats within this time and our algorithm will be sure that user is a spammer - it may disable local user account.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;known-spammers&#39; () {
+            cache-time = 10080
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="disabling-account">
+<h3><span class="section-number">3.4.2. </span>Disabling account<a class="headerlink" href="#disabling-account" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>If filter, depending on other filter reports, will establish that user is for sure a spammer it may not only ban user for some time, but it may disable that user account. This is done by default, if you wish to disable account deactivation add following line to <code class="docutils literal notranslate"><span class="pre">etc/init.properties</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;known-spammers&#39; () {
+            disable-account = false
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="print-list-of-detected-spammers">
+<h3><span class="section-number">3.4.3. </span>Print list of detected spammers<a class="headerlink" href="#print-list-of-detected-spammers" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>It is possible to request filter to print full list of known spammer which are currently banned every minute. To do so, you need to set <code class="docutils literal notranslate"><span class="pre">print-spammers</span></code> property to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;known-spammers&#39; () {
+            print-spammers = true
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="frequency-of-printing-list-of-spammers">
+<h3><span class="section-number">3.4.4. </span>Frequency of printing list of spammers<a class="headerlink" href="#frequency-of-printing-list-of-spammers" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>By default, list of detected spammers is printed to logs every day. If you wish you can adjust this value to 1 hour, then add following entry to <code class="docutils literal notranslate"><span class="pre">etc/init.properties</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;known-spammers&#39; () {
+            print-spammers-frequency = 60
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+</section>
+<section id="presence-subscription-filter">
+<h2><span class="section-number">3.5. </span>Presence subscription filter<a class="headerlink" href="#presence-subscription-filter" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>When there is a presence-based SPAM being sent using XMPP server in most cases there is a lot of <code class="docutils literal notranslate"><span class="pre">presence</span></code> of type <code class="docutils literal notranslate"><span class="pre">subscribe</span></code> being sent from the single JID. This behavior is annoying and has negative impact on the XMPP server as according to the XMPP specification each <code class="docutils literal notranslate"><span class="pre">presence</span></code> of type <code class="docutils literal notranslate"><span class="pre">subscribe</span></code> sent from JID which is not in the users roster causes adding this JID to the user’s roster until user declines subscription request.</p>
+<p>Detection is based on counting subscription request being sent from the same bare JID within a period of time.</p>
+<p>Below is list of possible settings which may be modified to adjust this filter behaviour.</p>
+<section id="number-of-allowed-subscription-requests-per-minute">
+<h3><span class="section-number">3.5.1. </span>Number of allowed subscription requests per minute<a class="headerlink" href="#number-of-allowed-subscription-requests-per-minute" title="Stały odnośnik do tego nagłówka"></a></h3>
+<p>Be default filter allows 5 subscription requests to be sent from the single JID per minute. If some client will send more than 5 subscription requests it will be marked as a spammer.</p>
+<p><strong>Setting filter to allow 7 subscription requests per minute.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;presence-subcribe&#39; () {
+            &#39;limit-per-minute&#39; = 7
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../Configuration.html" class="btn btn-neutral float-left" title="2. Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Poprzedni</a>
+        <a href="../Development.html" class="btn btn-neutral float-right" title="4. Development" accesskey="n" rel="next">Następny <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2022, Tigase, Inc.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

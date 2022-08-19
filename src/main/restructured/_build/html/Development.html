@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4. Development &mdash; TigaseDoc 0.1 - dokumentacja</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="prev" title="3. Filters" href="Filter/filter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> TigaseDoc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">2. Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Filter/filter.html">3. Filters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-of-a-new-filter">4.1. Implementation of a new filter</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TigaseDoc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><span class="section-number">4. </span>Development</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Development.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="development">
+<h1><span class="section-number">4. </span>Development<a class="headerlink" href="#development" title="Stały odnośnik do tego nagłówka"></a></h1>
+<p>You can easily add a new methods of detection if a packet is a spam or not. Simplest way is to implement a new filter.</p>
+<section id="implementation-of-a-new-filter">
+<h2><span class="section-number">4.1. </span>Implementation of a new filter<a class="headerlink" href="#implementation-of-a-new-filter" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>Each class used as a filter by <code class="docutils literal notranslate"><span class="pre">SpamProcessor</span></code> needs to implement <code class="docutils literal notranslate"><span class="pre">SpamFilter</span></code> interface.</p>
+<p>There are 3 important methods which need to be implemented by in <code class="docutils literal notranslate"><span class="pre">SpamFilter</span></code> interface:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">String</span> <span class="pre">getId()</span></code> - returns id of a filter</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">double</span> <span class="pre">getSpamProbability()</span></code> - returns probability of sender being a spammer after detection of a single message which is blocked <em>(from 0.0 to 1.0 where 1.0 means that it is a spammer)</em></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">boolean</span> <span class="pre">filter(Packet</span> <span class="pre">packet,</span> <span class="pre">XMPPResourceConnection</span> <span class="pre">session)</span></code> - method checking if a stanza is a spam (return <code class="docutils literal notranslate"><span class="pre">false</span></code> to stop stanza from being delivered)</p></li>
+</ul>
+<p>Simple filter with id <code class="docutils literal notranslate"><span class="pre">dummy-detector</span></code> which would look for messages with text <code class="docutils literal notranslate"><span class="pre">dummy</span></code>, block them and then mark sender as a spammer after 5 messages would look like this:</p>
+<p><strong>Example filter.</strong></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">test</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">tigase.spam.SpamFilter</span><span class="p">;</span>
+
+<span class="nd">@Bean</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;dummy-detector&quot;</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="n">SpamProcessor</span><span class="p">.</span><span class="na">class</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="kc">true</span><span class="p">)</span>
+<span class="kd">class</span> <span class="nc">DummyDetector</span> <span class="kd">implements</span> <span class="n">SpamFilter</span> <span class="p">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getId</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;dummy-detector&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">double</span> <span class="nf">getSpamProbability</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mf">0.2</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">filterPacket</span><span class="p">(</span><span class="n">Packet</span> <span class="n">packet</span><span class="p">,</span> <span class="n">XMPPResourceConnection</span> <span class="n">session</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="na">getElemName</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;message&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Element</span> <span class="n">bodyEl</span> <span class="o">=</span> <span class="n">packet</span><span class="p">.</span><span class="na">getElement</span><span class="p">().</span><span class="na">getChild</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bodyEl</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">String</span> <span class="n">body</span> <span class="o">=</span> <span class="n">bodyEl</span><span class="p">.</span><span class="na">getCData</span><span class="p">();</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">body</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="o">!</span><span class="n">body</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;dummy&quot;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Informacja</p>
+<p>If you expect packet to be processed multiple times (ie. by filter of a sender and filer of a received), then you should take that into account when you estimate value returned by <code class="docutils literal notranslate"><span class="pre">getSpamProbability()</span></code>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Wskazówka</p>
+<p>We have added <code class="docutils literal notranslate"><span class="pre">&#64;Bean</span></code> annotation to automatically enable this filter in the <code class="docutils literal notranslate"><span class="pre">SpamProcessor</span></code> in the Tigase XMPP Server and to be able to easily configure it without specifying full name of a class.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Filter/filter.html" class="btn btn-neutral float-left" title="3. Filters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Poprzedni</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2022, Tigase, Inc.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

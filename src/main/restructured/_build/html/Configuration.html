@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="pl" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2. Configuration &mdash; TigaseDoc 0.1 - dokumentacja</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="3. Filters" href="Filter/filter.html" />
+    <link rel="prev" title="1. Overview" href="Overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> TigaseDoc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Szukaj" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">1. Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#changing-active-spam-filters">2.1. Changing active SPAM filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sending-error-when-packet-is-dropped">2.2. Sending error when packet is dropped</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enabling-logging-of-dropped-messages">2.3. Enabling logging of dropped messages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Filter/filter.html">3. Filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Development.html">4. Development</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TigaseDoc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><span class="section-number">2. </span>Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Configuration.rst.txt" rel="nofollow"> Zobacz źródło strony</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration">
+<h1><span class="section-number">2. </span>Configuration<a class="headerlink" href="#configuration" title="Stały odnośnik do tego nagłówka"></a></h1>
+<p>To enable default set of SPAM filters with default settings you need to enable SessionManager processor spam-filter:</p>
+<p><strong>Enabling default SPAM filters.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man () {
+    &#39;spam-filter&#39; () {}
+}
+</pre></div>
+</div>
+<section id="changing-active-spam-filters">
+<h2><span class="section-number">2.1. </span>Changing active SPAM filters<a class="headerlink" href="#changing-active-spam-filters" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>You can configure active SPAM filters by setting enabling and disabling SPAM filters (subbeans of spam-filter processor bean).</p>
+<p><strong>Enabling message-same-long-body filter.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man&#39; () {
+    &#39;spam-filter&#39; () {
+        &#39;message-same-long-body&#39; () {}
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="sending-error-when-packet-is-dropped">
+<h2><span class="section-number">2.2. </span>Sending error when packet is dropped<a class="headerlink" href="#sending-error-when-packet-is-dropped" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>By default, due to nature of SPAM, you do not want to send error packet when SPAM packet is dropped as sending error back will:</p>
+<ul class="simple">
+<li><p>increase traffic on a server (which in rare cases may lead to overload of a XMPP server)</p></li>
+<li><p>notify spammer that it was not possible to delivery message</p></li>
+</ul>
+<p>It is possible to configure spam-filter to send error back, by setting true to spam-filter return-error property:</p>
+<p><strong>Allow sending error.</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;sess-man () {
+    &#39;spam-filter&#39; () {
+        return-error = true
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="enabling-logging-of-dropped-messages">
+<h2><span class="section-number">2.3. </span>Enabling logging of dropped messages<a class="headerlink" href="#enabling-logging-of-dropped-messages" title="Stały odnośnik do tego nagłówka"></a></h2>
+<p>It is possible to enable logging of dropped messages by adding <code class="docutils literal notranslate"><span class="pre">spam</span></code> to comma separate list of values for <code class="docutils literal notranslate"><span class="pre">--debug</span></code> property.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>--debug=spam
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Overview.html" class="btn btn-neutral float-left" title="1. Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Poprzedni</a>
+        <a href="Filter/filter.html" class="btn btn-neutral float-right" title="3. Filters" accesskey="n" rel="next">Następny <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2004-2022, Tigase, Inc.</p>
+  </div>
+
+  Zbudowano w <a href="https://www.sphinx-doc.org/">Sphinx</a> używając
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    dostarczone przez <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-19 00:06-0700\n"
-"PO-Revision-Date: 2022-08-20 23:29+0000\n"
+"PO-Revision-Date: 2022-08-22 20:42+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-spam-documentation/tigase-spam-documentation/zh_Hans/>\n"
@@ -58,67 +58,71 @@ msgstr "丢包时发送错误"
 msgid ""
 "By default, due to nature of SPAM, you do not want to send error packet "
 "when SPAM packet is dropped as sending error back will:"
-msgstr ""
+msgstr "默认情况下，由于垃圾邮件的性质，您不希望在丢弃垃圾邮件数据包时发送错误数据包"
+"，因为发送错误返回会："
 
 #: ../../Configuration.rst:34
 msgid ""
 "increase traffic on a server (which in rare cases may lead to overload of"
 " a XMPP server)"
-msgstr ""
+msgstr "增加服务器上的流量（在极少数情况下可能会导致 XMPP 服务器过载）"
 
 #: ../../Configuration.rst:36
 msgid "notify spammer that it was not possible to delivery message"
-msgstr ""
+msgstr "通知垃圾邮件发送者无法发送邮件"
 
 #: ../../Configuration.rst:38
 msgid ""
 "It is possible to configure spam-filter to send error back, by setting "
 "true to spam-filter return-error property:"
-msgstr ""
+msgstr "可以通过 设置 spam-filter return-error 属性为 true 来配置 spam-filter "
+"以发送错误："
 
 #: ../../Configuration.rst:40
 msgid "**Allow sending error.**"
-msgstr ""
+msgstr "**允许发送错误。**"
 
 #: ../../Configuration.rst:51
 msgid "Enabling logging of dropped messages"
-msgstr ""
+msgstr "启用丢弃消息的日志记录"
 
 #: ../../Configuration.rst:53
 msgid ""
 "It is possible to enable logging of dropped messages by adding ``spam`` "
 "to comma separate list of values for ``--debug`` property."
-msgstr ""
+msgstr "可以通过将 ``spam`` 添加到 ``--debug`` "
+"属性的逗号分隔值列表中来启用丢弃消息的日志记录。"
 
 #: ../../Development.rst:2
 msgid "Development"
-msgstr ""
+msgstr "发展"
 
 #: ../../Development.rst:4
 msgid ""
 "You can easily add a new methods of detection if a packet is a spam or "
 "not. Simplest way is to implement a new filter."
-msgstr ""
+msgstr "如果数据包是垃圾邮件，您可以轻松添加新的检测方法。最简单的方法是实现一个新的"
+"过滤器。"
 
 #: ../../Development.rst:7
 msgid "Implementation of a new filter"
-msgstr ""
+msgstr "新过滤器的实现"
 
 #: ../../Development.rst:9
 msgid ""
 "Each class used as a filter by ``SpamProcessor`` needs to implement "
 "``SpamFilter`` interface."
-msgstr ""
+msgstr "``SpamProcessor`` 用作过滤器的每个类都需要实现 ``SpamFilter`` 接口。"
 
 #: ../../Development.rst:11
 msgid ""
 "There are 3 important methods which need to be implemented by in "
 "``SpamFilter`` interface:"
-msgstr ""
+msgstr "``SpamFilter`` 接口中有 3 个重要的方法需要实现："
 
 #: ../../Development.rst:13
 msgid "``String getId()`` - returns id of a filter"
-msgstr ""
+msgstr "``String getId()`` - 返回过滤器的 id"
 
 #: ../../Development.rst:15
 msgid ""
@@ -126,6 +130,9 @@ msgid ""
 "spammer after detection of a single message which is blocked *(from 0.0 "
 "to 1.0 where 1.0 means that it is a spammer)*"
 msgstr ""
+"``double getSpamProbability()`` - "
+"在检测到一条被阻止的消息后返回发件人成为垃圾邮件发送者的概率 *（从 0.0 到 1."
+"0，其中 1.0 表示它是垃圾邮件发送者）*"
 
 #: ../../Development.rst:17
 msgid ""
@@ -133,6 +140,8 @@ msgid ""
 "method checking if a stanza is a spam (return ``false`` to stop stanza "
 "from being delivered)"
 msgstr ""
+"``boolean filter(Packet packet, XMPPResourceConnection session)`` - "
+"检查节是否为垃圾邮件的方法（返回 ``false`` 以停止传递节）"
 
 #: ../../Development.rst:19
 msgid ""
@@ -140,10 +149,12 @@ msgid ""
 "with text ``dummy``, block them and then mark sender as a spammer after 5"
 " messages would look like this:"
 msgstr ""
+"带有 id ``dummy-detector`` 的简单过滤器将查找带有文本 ``dummy`` "
+"的消息，阻止它们，然后在 5 条消息后将发件人标记为垃圾邮件发送者，如下所示："
 
 #: ../../Development.rst:21
 msgid "**Example filter.**"
-msgstr ""
+msgstr "**示例过滤器。**"
 
 #: ../../Development.rst:58
 msgid ""
@@ -151,6 +162,8 @@ msgid ""
 "sender and filer of a received), then you should take that into account "
 "when you estimate value returned by ``getSpamProbability()``."
 msgstr ""
+"如果您希望数据包被处理多次（即通过过滤器过滤发送者和过滤器接收），"
+"那么您应该在估计 ``getSpamProbability()`` 返回的值时考虑到这一点。"
 
 #: ../../Development.rst:62
 msgid ""
@@ -158,20 +171,22 @@ msgid ""
 " the ``SpamProcessor`` in the Tigase XMPP Server and to be able to easily"
 " configure it without specifying full name of a class."
 msgstr ""
+"我们在 Tigase XMPP 服务器的 ``SpamProcessor`` 中添加了 ``@Bean`` "
+"注解来自动启用这个过滤器，并且能够在不指定类的全名的情况下轻松配置它。"
 
 #: ../../Filter/filter.rst:2
 msgid "Filters"
-msgstr ""
+msgstr "过滤器"
 
 #: ../../Filter/filter.rst:4
 msgid ""
 "In this section there is a list of available filters and detailed "
 "description of each filtering algorithm."
-msgstr ""
+msgstr "在本节中，有可用过滤器列表和每种过滤算法的详细说明。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:2
 msgid "Same long message body"
-msgstr ""
+msgstr "相同的长消息正文"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:4
 msgid ""
@@ -180,29 +195,32 @@ msgid ""
 "SPAM message contains same ``body`` part. This filter is identified by "
 "following id ``message-same-long-body``."
 msgstr ""
+"当使用 XMPP 服务器发送垃圾邮件时，在大多数情况下，具有较长 ``body`` "
+"容量的消息数量会增加，并且在大多数情况下，每条垃圾邮件消息都包含相同的 "
+"``body`` 部分。此过滤器由以下 id ``message-same-long-body`` 标识。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:6
 msgid "Detection is based on:"
-msgstr ""
+msgstr "检测基于："
 
 #: ../../Filter/MessageFilterSameLongBody.inc:8
 msgid "message body being longer that particular value"
-msgstr ""
+msgstr "消息正文比特定值更长"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:10
 msgid "multiple messages being sent with same long body"
-msgstr ""
+msgstr "使用相同的长正文发送多条消息"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:12
 #: ../../Filter/PresenceSubscribeFilter.inc:8
 msgid ""
 "Below is list of possible settings which may be modified to adjust this "
 "filter behaviour."
-msgstr ""
+msgstr "下面是可能的设置列表，可以修改这些设置以调整此过滤器行为。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:15
 msgid "Message body length"
-msgstr ""
+msgstr "消息正文长度"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:17
 msgid ""
@@ -211,20 +229,25 @@ msgid ""
 "of message body and process it further only if message exceeds declared "
 "message body length *(default: 100 chars)*."
 msgstr ""
+"垃圾邮件消息通常是较长的消息（超过 100 "
+"个字符）。为了减少过滤所需的过滤和内存开销，我们检查消息正文的长度，"
+"并仅在消息超过声明的消息正文长度 *（默认值：100 个字符）* "
+"时对其进行进一步处理。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:19
 msgid ""
 "You can also check messages with smaller body (ie. only 50 chars) by "
 "setting ``body-size`` property to ``50``."
-msgstr ""
+msgstr "您还可以通过将 ``body-size`` 属性设置为 ``50`` 来检查具有较小正文（即只有 50 "
+"个字符）的消息。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:21
 msgid "**Setting filter to check message with body bigger that 50 chars.**"
-msgstr ""
+msgstr "**设置过滤器以检查正文大于 50 个字符的消息。**"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:34
 msgid "Number of allowed message with same body"
-msgstr ""
+msgstr "所允许的具有相同正文的消息数"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:36
 msgid ""
@@ -235,14 +258,19 @@ msgid ""
 " allow 20 messages with same body to be processed by SessionManager. If "
 "you wish to change this limit set ``number-limit`` to appropriate value."
 msgstr ""
+"在大多数情况下，具有相同正文的消息会发送给多个用户。过滤器将计算具有相同正文"
+"的消息（其大于声明的消息正文长度），如果超过消息数量限制，则将检测到具有相同"
+"正文的任何其他消息并将其标记为垃圾邮件。默认情况下，我们允许 SessionManager "
+"处理 20 条具有相同正文的消息。如果您希望更改此限制，请将 ``number-limit`` "
+"设置为适当的值。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:38
 msgid "**Setting number of allowed message to 10.**"
-msgstr ""
+msgstr "**将允许的消息数量设置为 10。**"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:51
 msgid "Size of counters cache"
-msgstr ""
+msgstr "计数器缓存容量"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:53
 msgid ""
@@ -252,14 +280,17 @@ msgid ""
 " To change size of counters cache assign proper value to ``counter-size-"
 "limit``."
 msgstr ""
+"我们处理每条消息，对于每条正文长度超过正文长度限制的消息，我们需要保持计数器"
+"。这个计数器保存在缓存中，其大小是可配置的，默认情况下等于 "
+"``10000``。要更改计数器缓存的大小，请为 ``counter-size-limit`` 分配适当的值。"
 
 #: ../../Filter/MessageFilterSameLongBody.inc:55
 msgid "**Increasing cache size to 1000000.**"
-msgstr ""
+msgstr "**将缓存大小增加到 1000000。**"
 
 #: ../../Filter/MessageErrorFilterEnsureErrorChild.inc:2
 msgid "Error message and missing <error/> child"
-msgstr ""
+msgstr "错误消息和缺少 <error/> child"
 
 #: ../../Filter/MessageErrorFilterEnsureErrorChild.inc:4
 msgid ""
@@ -269,16 +300,20 @@ msgid ""
 "which is required for all packets of type ``error``. This filter detects "
 "this kind of messages and marks them as SPAM."
 msgstr ""
+"如果我们将它们与 XMPP 规范进行比较，一些垃圾邮件消息作为无效节发送，即 "
+"``type`` 属性设置为 ``error`` 的 ``<message/>`` 节在没有子元素 ``<error/>`` "
+"的情况下发送，这是所有 ``error`` "
+"类型的数据包所必需的。此过滤器检测到此类邮件并将其标记为垃圾邮件。"
 
 #: ../../Filter/MessageErrorFilterEnsureErrorChild.inc:6
 msgid ""
 "This filter is identified by following id ``message-error-ensure-error-"
 "child``."
-msgstr ""
+msgstr "此过滤器由以下 id ``message-error-ensure-error-child`` 标识。"
 
 #: ../../Filter/MucMessageFilterEnsureToFullJid.inc:2
 msgid "Groupchat messages sent to bare JID"
-msgstr ""
+msgstr "群聊消息发送到裸 JID"
 
 #: ../../Filter/MucMessageFilterEnsureToFullJid.inc:4
 msgid ""
@@ -289,6 +324,10 @@ msgid ""
 "with same body, because there may be many users which are participants of"
 " same MUC room and should receive same message."
 msgstr ""
+"在某些情况下，垃圾邮件消息作为群聊消息（ ``type`` 属性设置为 ``groupchat`` 的"
+"消息）发送。对于这种类型的消息，我们不能使用基于以相同正文发送的消息数量的过"
+"滤，因为在 MUC 消息的情况下，我们必须接受大量具有相同正文的消息，"
+"因为可能有许多用户是同一个 MUC 房间的参与者，应该收到相同的消息。"
 
 #: ../../Filter/MucMessageFilterEnsureToFullJid.inc:6
 msgid ""
@@ -299,10 +338,14 @@ msgid ""
 "addressing message with full jid. This filter is identified by following "
 "id ``muc-message-ensure-to-full-jid``."
 msgstr ""
+"为了解决这个问题，我们决定删除所有发送到我们服务器 XMPP 用户的群聊消息，其中 "
+"``to`` 属性设置为裸 jid，因为真正的 MUC 组件知道加入特定房间的用户资源，"
+"并且只会发送消息到通过使用完整 jid 寻址消息来获取此特定资源。此过滤器由 id "
+"``muc-message-ensure-to-full-jid`` 标识。"
 
 #: ../../Filter/KnownSpammersFilter.inc:2
 msgid "Known spammers"
-msgstr ""
+msgstr "已知的垃圾邮件发送者"
 
 #: ../../Filter/KnownSpammersFilter.inc:4
 msgid ""
@@ -314,6 +357,11 @@ msgid ""
 " jid as a spammer. This will result in a ban for any packet exchange with"
 " this user for configured `ban time <#ban-time>`__."
 msgstr ""
+"为了处理垃圾邮件，需要过滤每封邮件以验证它是否是垃圾邮件。通常垃圾邮件发送者"
+"使用相同的帐户发送更多的消息。此过滤器利用它来减少过滤垃圾邮件所需的时间，因"
+"为当任何其他过滤器将邮件标记为垃圾邮件时，此过滤器将被通知并将发件人jid标记为"
+"垃圾邮件发送者。这将导致在配置的 :ref:`ban time<ban-time>` "
+"内禁止与该用户进行任何数据包交换。"
 
 #: ../../Filter/KnownSpammersFilter.inc:6
 msgid ""
@@ -322,14 +370,17 @@ msgid ""
 "messages and ban time will be set to 15 minutes then users will be banned"
 " for 300 minutes (5 hours)."
 msgstr ""
+"如果用户将发送大量垃圾邮件，他将被禁止为每条垃圾邮件配置禁止时间，"
+"即如果用户将发送 20 条消息并将禁止时间设置为 15 分钟，则用户将被禁止 300 "
+"分钟（5 小时）。"
 
 #: ../../Filter/KnownSpammersFilter.inc:8
 msgid "This filter is identified by following id ``known-spammers``."
-msgstr ""
+msgstr "此过滤器由以下 id ``known-spammers`` 标识。"
 
 #: ../../Filter/KnownSpammersFilter.inc:10
 msgid "**Ban time**"
-msgstr ""
+msgstr "**禁止时间**"
 
 #: ../../Filter/KnownSpammersFilter.inc:12
 msgid ""
@@ -338,10 +389,13 @@ msgid ""
 " minutes and if you would like to increase it to 30 minutes just add "
 "following line to ``etc/init.properties`` file:"
 msgstr ""
+"用户标记为垃圾邮件发送者的时间（以分钟为单位）里将无法与任何其他用户交换数据"
+"包。默认情况下，此值设置为 15 分钟，如果您想将其增加到 30 分钟，"
+"只需将以下行添加到 ``etc/init.properties`` 文件："
 
 #: ../../Filter/KnownSpammersFilter.inc:25
 msgid "Cache time"
-msgstr ""
+msgstr "缓存时间"
 
 #: ../../Filter/KnownSpammersFilter.inc:27
 msgid ""
@@ -350,10 +404,13 @@ msgid ""
 "but if the situation repeats within this time and our algorithm will be "
 "sure that user is a spammer - it may disable local user account."
 msgstr ""
+"用户将被记住为垃圾邮件发送者的时间（以分钟为单位）。用户将能够与其他用户交换"
+"消息（在禁止时间过去后），但如果在这段时间内情况重复，"
+"我们的算法将确定用户是垃圾邮件发送者 - 它可能会禁用本地用户帐户。"
 
 #: ../../Filter/KnownSpammersFilter.inc:40
 msgid "Disabling account"
-msgstr ""
+msgstr "禁用帐户"
 
 #: ../../Filter/KnownSpammersFilter.inc:42
 msgid ""
@@ -363,10 +420,13 @@ msgid ""
 "disable account deactivation add following line to "
 "``etc/init.properties`` file:"
 msgstr ""
+"根据其他过滤器报告，如果过滤器确定用户肯定是垃圾邮件发送者，它可能不仅会禁止"
+"用户一段时间，而且可能会禁用该用户帐户。这是默认完成的，如果您希望禁用帐户停"
+"用，请在 ``etc/init.properties`` 文件中添加以下行："
 
 #: ../../Filter/KnownSpammersFilter.inc:55
 msgid "Print list of detected spammers"
-msgstr ""
+msgstr "打印检测到的垃圾邮件发送者列表"
 
 #: ../../Filter/KnownSpammersFilter.inc:57
 msgid ""
@@ -374,10 +434,12 @@ msgid ""
 "which are currently banned every minute. To do so, you need to set "
 "``print-spammers`` property to ``true``."
 msgstr ""
+"可以请求过滤器每分钟打印当前被禁止的已知垃圾邮件发送者的完整列表。为此，"
+"您需要将 ``print-spammers`` 属性设置为 ``true``。"
 
 #: ../../Filter/KnownSpammersFilter.inc:70
 msgid "Frequency of printing list of spammers"
-msgstr ""
+msgstr "打印垃圾邮件列表的频率"
 
 #: ../../Filter/KnownSpammersFilter.inc:72
 msgid ""
@@ -385,10 +447,13 @@ msgid ""
 "you wish you can adjust this value to 1 hour, then add following entry to"
 " ``etc/init.properties`` file:"
 msgstr ""
+"默认情况下，检测到的垃圾邮件发送者列表每天都会打印到日志中。"
+"如果您希望可以将此值调整为 1 小时，则将以下条目添加到 ``etc/init.properties``"
+" 文件中："
 
 #: ../../Filter/PresenceSubscribeFilter.inc:2
 msgid "Presence subscription filter"
-msgstr ""
+msgstr "状态订阅过滤器"
 
 #: ../../Filter/PresenceSubscribeFilter.inc:4
 msgid ""
@@ -400,42 +465,49 @@ msgid ""
 "causes adding this JID to the user’s roster until user declines "
 "subscription request."
 msgstr ""
+"在大多数情况下，当使用 XMPP 服务器发送基于存在的垃圾邮件时，会从单个 JID "
+"发送大量 ``subscribe`` 类型的 ``presence``。这种行为很烦人，并且对 XMPP "
+"服务器有负面影响，因为根据 XMPP 规范，从不在用户名册中的 JID 发送的每个 "
+"``subscribe`` 类型的 ``presence`` 都会导致将此 JID "
+"添加到用户名册中，直到用户拒绝订阅请求。"
 
 #: ../../Filter/PresenceSubscribeFilter.inc:6
 msgid ""
 "Detection is based on counting subscription request being sent from the "
 "same bare JID within a period of time."
-msgstr ""
+msgstr "检测是基于在一段时间内从同一个裸 JID 发送的订阅请求计数。"
 
 #: ../../Filter/PresenceSubscribeFilter.inc:11
 msgid "Number of allowed subscription requests per minute"
-msgstr ""
+msgstr "每分钟允许的订阅请求数"
 
 #: ../../Filter/PresenceSubscribeFilter.inc:13
 msgid ""
 "Be default filter allows 5 subscription requests to be sent from the "
 "single JID per minute. If some client will send more than 5 subscription "
 "requests it will be marked as a spammer."
-msgstr ""
+msgstr "默认过滤器允许每分钟从单个 JID 发送 5 个订阅请求。如果某些客户端将发送超过 5 "
+"个订阅请求，它将被标记为垃圾邮件发送者。"
 
 #: ../../Filter/PresenceSubscribeFilter.inc:15
 msgid "**Setting filter to allow 7 subscription requests per minute.**"
-msgstr ""
+msgstr "**设置过滤器以允许每分钟 7 个订阅请求。**"
 
 #: ../../Overview.rst:1
 msgid "Welcome to Tigase SPAM Filter guide."
-msgstr ""
+msgstr "欢迎使用 Tigase 垃圾邮件过滤器指南。"
 
 #: ../../Overview.rst:4
 msgid "Overview"
-msgstr ""
+msgstr "概述"
 
 #: ../../Overview.rst:6
 msgid ""
 "This Tigase SPAM Filter project contains additional features provided for"
 " Tigase XMPP Server to reduce number of sent/received SPAM messages."
-msgstr ""
+msgstr "这个 Tigase 垃圾邮件过滤器项目包含为 Tigase XMPP "
+"服务器提供的附加功能，以减少发送/接收的垃圾邮件消息的数量。"
 
 #: ../../index.rst:4
 msgid "Tigase SPAM Filter - Version 2.3.0"
-msgstr ""
+msgstr "Tigase 垃圾邮件过滤器 - 版本 2.3.0"
